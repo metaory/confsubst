@@ -1,0 +1,152 @@
+#!/bin/bash
+
+# shellcheck disable=SC2317
+# shellcheck disable=SC2154
+# shellcheck disable=SC2034
+
+# shellcheck source=/dev/null
+# . "$MXLIB/lib.log.sh"
+
+SCRIPT="${0##*/}"
+VERSION="0.0.1"
+# -----------------------------------
+function log {
+  local FUN="${FUNCNAME[1]}"
+  local LNR="${BASH_LINENO[0]}"
+  local KEY=" [${SCRIPT}:${LNR}]:(${FUN}):"
+  local MSG="$KEY$*"
+  local MOD="$1"
+  local FIN=0
+  if [[ $MOD == ?(-)+([0-9]) ]]; then
+    shift
+    MSG="$KEY$*"
+    (( "$MOD" > 10 )) && FIN=1 && MSG="[ERROR:${MOD}] ${MSG}" && echo "$MSG"
+    (( "$MOD" > 4 && "$MOD" < 10 )) && MSG="[WARN:${MOD}] ${MSG}" && echo "$MSG"
+    (( "$MOD" < 4 )) && MSG="[TRACE:${MOD}] ${MSG}"
+  fi
+  echo "$MSG" >> /tmp/mxsh.log
+  (( "$FIN" )) && exit "$MOD"
+}
+
+while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do case $1 in
+  -V | --version ) echo "v${VERSION}" && exit ;;
+  # -s | --string ) shift; string=$1; ;;
+  # -f | --flag ) flag=1; ;;
+esac; shift; done
+if [[ "$1" == '--' ]]; then shift; fi
+
+log "there is $# args"
+if (( "$#" == 0 )); then
+  log 5 'confsubst requires at least one file to start'
+  log 5 'operate on current path?'
+  log 5 "$PWD"
+  exit
+fi
+
+while [ "$1" ]; do
+  log "doing one: $1"
+  shift
+done
+
+log 'done with all'
+# templates="$(find templates/* -type f 2> /dev/null)"
+
+# ! [[ -d ./templates ]] && log 5 'no files found'
+
+# ! [[ -f ./.env ]] && log 3 '.env file not found'
+
+# [[ -z "$templates" ]] && log 7 'cant find any templates' && exit 1
+
+# mkdir output /tmp/mxc &> /dev/null
+
+
+
+
+
+
+
+exit
+
+if [[ -f ./.env ]]; then
+  log 5 '.env file not found'
+  source .env
+else
+  log 3 '.env file not found'
+fi
+
+function get_mode_data {
+  # local mode
+  # local name
+  local dest
+  while read -r line; do
+    if (( $(expr "$line" : '.*mxc:') )); then
+      # name="$(sed -r 's/.*mxc:.*name=(.*)( |$).*/\1/' <<< "$line")"
+      dest="$(sed -r 's/.*mxc:.*dest=(.*)( |$).*/\1/' <<< "$line")"
+      # prt "  [name: $name] [dest: $dest]"
+      echo "${dest}"
+      break
+    fi
+  done <"$1"
+}
+
+function generate {
+  # for tpl_path in *; do
+
+  for tpl in $templates; do
+
+    local file="${tpl##*/}"
+    local dest
+
+    dest="$(get_mode_data "$tpl")"
+    dest="${dest:-/tmp/mxc/$file}"
+
+    prt " ($tpl::$file)"
+    prt " SRC:$file -> DST:$dest"
+
+    # envsubst < "$tpl" | tee \
+    #   >(cat > /tmp/mxc/"$file") \
+    #   >(cat > "./output/$file") &> /dev/null
+
+    done
+  }
+
+  generate
+
+
+# Stext="Hallo World mxc: dest=/tmp/foo/xorg.xs foo bar"
+# mode="$(sed -r 's/.*mxc: (.*)/\1/' <<< "$Stext")"
+# dest="$(sed -r 's/.*dest=(.*) .*/\1/' <<< "$Stext")"
+# prt "$mode $dest"
+
+# data="$(cat templates/dummy.xdefaults)"
+# echo "data :: $data"
+
+# expr "$Stext" : '^\(.[a-z]*\)' # Hallo
+# expr "$Stext" : '.*World'      # 11
+# expr "$Stext" : '.*mxc:'
+# echo '---------------------------------'
+# echo "$Stext"
+# echo '======'
+# expr "$Stext" : '\(.dest=.*\)'
+#
+# expr "$Stext" : '^\(.[a-z]*\)' # Hallo
+# expr "$Stext" : '^.[a-z]*' # 5
+# expr "$Stext" : '\(.*World\)' # Hallo World
+# expr "$Stext" : '.*World' # 11
+# echo '##########'
+# Stext="Hallo World mxc: dest=tmpfooxorg.xs foo bar"
+# expr "$Stext" : '.*mxc:\(.*dest=\([0-9a-z.\/]+\)\)'
+# echo 'here:::'
+# expr "$Stext" : '.*dest=\(.*[0-9a-z\.\/]\)'
+# expr "$Stext" : '.*dest=\([a-b].*\) '
+# echo '@@@@@'
+# expr "$Stext" : '.*\(mxc.*\)'
+#
+# # expr "$Stext" : '\(.*mxc\)' # abcABC1
+# # expr "$Stext" : '.*\(dest=\([a-z]\)\)'
+#
+#
+# # stringZ=$Stext
+# # expr "$stringZ" : '\(.[b-c]*[A-Z]..[0-9]\)' # abcABC1
+# # expr "$stringZ" : '\(.[b-c]*[A-Z]..[0-9]\)' # abcABC1
+# # expr "$stringZ" : '\(.......\)'             # abcABC1
