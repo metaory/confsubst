@@ -7,19 +7,22 @@
 #### With self-contained modeline like options
 
 ## Features
-- _optional_ `.env` to override environment
-- _optional_ `modeline` like syntax for optional _self-contained*_ file settings
-- _optional_ `Pre`/`Post` hooks for other custom pre/post processing
-- _optional_ `Path` for replacing existing file
+-  `.env` to override environment
+-  `modeline` like syntax for optional _self-contained*_ file settings
+-  `Pre`/`Post` hooks for other custom pre/post processing
+-  `Path` for replacing existing file
 
 ---
 
 ## Example Use Cases
 
 #### Generate Environment Variables at Runtime and Substitute config file placeholders with it
-The `Pre Hook` can **generate** some variables at runtime
-The `Path` define the **destination** path
-The `Post Hook` could then **restart** some service or app
+
+`Pre Hook` to **generate** some variables at runtime
+
+`Path` to define the **destination** path
+
+`Post Hook` to then **restart** some service or app
 
 #### Update Colorscheme System Wide
 To easily substitute colorscheme variables in different applications with different formats
@@ -35,52 +38,79 @@ For example:
 - ...
 
 The `Pre Hook` could **generate** some random colorscheme on the fly
+
 _or use system or `.env` values_
 
 The `Path` would define the **destination** path
+
 _or the output will be only on /tmp_
 
 The `Post Hook` could then **reload** a terminal or window manager config
 
 ---
 
-## What it does
+## Hooks
+Hooks can be used to for any pre/post processing; like
 
-#### Source `.env` in current working directory; `if` found _(optional)_
+A pre hook to produce dynamic values at runtime, Or any other pre steps
+
+A post hook to do clean up, reload apps config, or run any other post steps.
+
+> _path must executable_
+
+---
+
+## How it works
+
+#### Source `.env` in current working directory
+
+`if` found _(optional)_
+
 > Syntax: simple "KEY=VAL" pairs on separate lines:
 
 > ```bash
 > MY_VAR_NAME=MY_VALUE
 > ```
 
-#### Parse `modeline` in the file; `if` (`mxc:`) is found _(optional)_
+#### Parse `modeline` in the file
+
+`if` (`mxc:`) is found _(optional)_
+
 > An Optional Vim like syntax to define file settings
 
 > `[text{white}]{mx:|mxc:|mxconf:}[white]{options}`
 
-#### Exec Pre Hook; `if` (`pre=`) is found in `modeline` _(optional)_
+#### Exec Pre Hook
+
+`if` (`pre=`) is found in `modeline` _(optional)_
+
 > _should have execute permission (x)_
 
-> To handle any custom user **preparation steps** for a file
+> To handle any custom user **pre processing steps** for a file
 
-> `mxc: pre=~/bin/my_pre_hook_script`
+> `mxc: pre=~/bin/some_prehook_executable`
 
 #### Populate(substitute) the file(s) with System or `.env` values
 > using [envsubst](https://man.archlinux.org/man/envsubst.1.en)
 
-#### Exec **Post Hook**; `if` (`post=`) is found in `modeline` _(optional)_
+#### Exec **Post Hook**
+
+`if` (`post=`) is found in `modeline` _(optional)_
+
 > _should have execute permission (x)_
 
 > To handle any custom user **post processing steps** for a file
 
-> `mxc: post=~/bin/my_post_hook_script`
+> `mxc: post=~/bin/my_post_hook`
 
 #### Copy the populated file in tmp with the original name
 > `/tmp/mxc/somename.whatever` for example
 
 > `~/dummy/kitty.conf` would produce `/tmp/kitty.conf`
 
-#### Copy the populated file to a secondary path; `if` (`path=`) is found in `modeline` _(optional)_ 
+#### Copy the populated file to a secondary path
+`if` (`path=`) is found in `modeline` _(optional)_
+
 > `mxc: path=~/.config/nvim/lua/my_theme.lua
 
 ---
@@ -93,7 +123,7 @@ The `Post Hook` could then **reload** a terminal or window manager config
 - Optionally there can be a **modeline** comment somewhere in the file
 
 #### modeline syntax
-The **modeline** follows similar syntax to the first form of (n)Vim modeline  [:h modeline](https://neovim.io/doc/user/options.html#modeline)
+The **modeline** follows similar syntax to the first form of (n)Vim modeline [:h modeline](https://neovim.io/doc/user/options.html#modeline)
 
 The **modeline** and **all** its keys are **optional**
 
@@ -103,22 +133,22 @@ The **modeline** and **all** its keys are **optional**
   [text{white}]       empty or any text followed by at least one blank character (<Space> or <Tab>)
   {mx:|mxc:|mxconf:}  the string "mx:", "mxc:" or "mxconf:"
   [white]             optional white space
-  {options}           a list of key-value settings, separated with white space
+  {options}           a list of key-value options, separated with white space
 ```
 
-#### modeline can have the following keys
-- `label` label for display only     _optional_
-- `path`  secondary destination path _optional_
-- `pre`   pre hook path              _optional_
-- `post`  post hook path             _optional_
+#### modeline can have the following keys _(all are optional)_
+- `label` display label
+- `path`  secondary destination path
+- `pre`   pre hook executable path
+- `post`  post hook executable path
 
 ###### Example modeline:
 
-`mxc: label=[label] path={destination_path} pre=[script_path] post=[script_path]`
+`mxc: label=[label] path={dest_path} pre=[script_path] post=[script_path]`
 
 Real world example in conf file
 
-`mxc: label=my_kitty_theme path=~/.config/kitty/kitty-theme.conf post=~/bin/reload_kitty_config.sh`
+`mxc: label=kitty_theme path=~/.config/kitty/kitty-theme.conf post=~/bin/reload_kitty.sh`
 
 ---
 
@@ -131,7 +161,7 @@ _from the [coreutils](https://archlinux.org/packages/core/x86_64/coreutils/)_
 
 ## Sample .env file
 
-Syntax: simple "KEY=VAL" pairs on separate lines _[man pam_env.conf](https://man.archlinux.org/man/pam_env.conf.5.en#:~:text=Now%20some-,simple)_
+> Syntax: simple "KEY=VAL" pairs on separate lines: _[man pam_env.conf](https://man.archlinux.org/man/pam_env.conf.5.en#:~:text=Now%20some-,simple)_
 
 ```bash
 # .env
