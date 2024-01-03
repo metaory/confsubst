@@ -188,12 +188,12 @@ The **modeline** follows similar syntax to the first form of (n)Vim modeline [:h
 The **modeline** and **all** its keys are **optional**
 
 ```cpp
-  [text{white}]{mx:|mxc:|mxconf:}[white]{options}
+[text{white}]{mx:|mxc:|mxconf:}[white]{options}
 
-  [text{white}]       empty or any text followed by at least one blank character (<Space> or <Tab>)
-  {mx:|mxc:|mxconf:}  the string "mx:", "mxc:" or "mxconf:"
-  [white]             optional white space
-  {options}           a list of key-value options, separated with white space
+[text{white}]       empty or any text followed by at least one blank character (<Space> or <Tab>)
+{mx:|mxc:|mxconf:}  the string "mx:", "mxc:" or "mxconf:"
+[white]             optional white space
+{options}           a list of key-value options, separated with white space
 ```
 
 #### modeline can have the following keys _(all are optional)_
