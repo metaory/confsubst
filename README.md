@@ -2,9 +2,9 @@
 
 ## Templating and Variable Interpolation CLI Utility for any file
 
-### ◯ Substitutes Config Placeholders
-### ◯ Run Pre/Post Hooks
-### ◯ Self-contained Options with modeline like syntax
+###  ● Substitutes Config Placeholders
+###  ● Run Pre/Post Hooks
+###  ● Self-contained Options with modeline like syntax
 
 ## Features
 -  `.env` to override environment
