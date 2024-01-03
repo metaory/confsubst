@@ -38,7 +38,7 @@ ln -sfv confsubst /usr/bin/confsubst
 # Usage help
 confsubst --help
 
- # Use .env in pwd or system env
+ # Use .env in cwd or system env
 confsubst kitty-theme-template.conf nvim-colors.lua
 
 # Explicitly set env and output path
@@ -217,7 +217,7 @@ Real world example in conf file
 - You can View your current environment values with `printenv` or `env`
 _from the [coreutils](https://archlinux.org/packages/core/x86_64/coreutils/)_
 
-#### You can Override the environment by placing a `.env` file
+#### You can Override the environment by providing an file or with `.env` in CWD
 
 ## Sample .env file
 
