@@ -317,10 +317,11 @@ All of Current requirements are part of the [base](https://archlinux.org/package
 
 # TODOs
 
-- [ ]: variable substitution
-- [ ]: handle directories
-- [ ]: parse modeline
-- [ ]: implement hooks
+- [ ] variable substitution
+- [ ] handle directories
+- [ ] parse modeline
+- [ ] pre/post hooks
+- [ ] inline hooks
 
 ---
 
