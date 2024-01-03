@@ -211,6 +211,7 @@ Real world example in conf file
 `# mxc: label=kitty_theme path=~/.config/kitty/kitty-theme.conf post=~/bin/reload_kitty.sh`
 
 `; mxc: label=xresources path=~/.Xresources post=~/bin/merge_xrdb.sh`
+
 ---
 
 ## Environments
