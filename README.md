@@ -1,16 +1,76 @@
 # confsubst [WIP]
 
-## Simple templating CLI tool for any Config file
+## Templating and Variable Interpolation CLI Utility for any file
 
-### Run Pre/Post Hooks, Substitutes config placeholders and Distribute
-
-#### With self-contained modeline like options
+### ◯ Substitutes Config Placeholders
+### ◯ Run Pre/Post Hooks
+### ◯ Self-contained Options with modeline like syntax
 
 ## Features
 -  `.env` to override environment
 -  `modeline` like syntax for optional _self-contained*_ file settings
 -  `Pre`/`Post` hooks for other custom pre/post processing
 -  `Path` for replacing existing file
+
+---
+
+# Installation
+
+- clone repo
+- give execution permissions
+- place it in your path
+
+```bash
+# Clone the repo
+git clone git@github.com:metaory/confsubst.git
+
+# Navigate to repo
+cd confsubst
+
+# Give execution permissions
+chmod +x confsubst
+
+# Link it somewhere in your PATH
+ln -sfv confsubst /usr/bin/confsubst
+
+# Use it anywhere
+
+# Usage help
+confsubst --help
+
+ # Use .env in pwd or system env
+confsubst kitty-theme-template.conf nvim-colors.lua
+
+# Explicitly set env and output path
+confsubst -e ~/dummy/.env -o ~/output kitty-theme-template.conf nvim-colors.lua
+```
+
+---
+
+## Usage
+```md
+USAGE
+=====
+  confsubst [OPTIONS] [--] (DIR | FILE...)
+  substitute placeholders in file(s)
+
+OPTIONS
+=======
+  -e, --env FILE     explicitly set env path
+  -o, --output DIR   explicitly set output path
+
+  -H, --no-modeline  dont parse modelines
+  -H, --no-hook      dont run pre/post hooks
+  -d, --dryrun       dont change anything
+  -f, --force        forcefull update
+  -n, --quiet        suppress all messages
+
+  -v, --version      display this help and exit
+  -h, --help         display this help and exit
+
+  --verbose          be more verbose
+  --debug            annotate program execution
+```
 
 ---
 
@@ -56,7 +116,7 @@ A pre hook to produce dynamic values at runtime, Or any other pre steps
 
 A post hook to do clean up, reload apps config, or run any other post steps.
 
-> _path must executable_
+> _hook path must executable_
 
 ---
 
@@ -88,7 +148,7 @@ A post hook to do clean up, reload apps config, or run any other post steps.
 
 > To handle any custom user **pre processing steps** for a file
 
-> `mxc: pre=~/bin/some_prehook_executable`
+> `mxc: pre=~/bin/some_prehook`
 
 #### Populate(substitute) the file(s) with System or `.env` values
 > using [envsubst](https://man.archlinux.org/man/envsubst.1.en)
@@ -115,7 +175,7 @@ A post hook to do clean up, reload apps config, or run any other post steps.
 
 ---
 
-## Config (template) file
+## Config (template) files
 - All provided files (or all files in provided directory) will parsed and populated
 
 - The file can be any ascii charset file with any name and extension
@@ -236,7 +296,6 @@ color8     $C08
 ```
 ---
 
-
 ---
 
 # Requirements
@@ -249,6 +308,15 @@ All of Current requirements are part of the [base](https://archlinux.org/package
 # Optional Requirements
 
 - [Pastel](https://github.com/sharkdp/pastel) - color preview
+
+---
+
+# TODOs
+
+- [ ]: variable substitution
+- [ ]: handle directories
+- [ ]: parse modeline
+- [ ]: implement hooks
 
 ---
 

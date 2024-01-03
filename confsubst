@@ -7,48 +7,91 @@
 # shellcheck source=/dev/null
 # . "$MXLIB/lib.log.sh"
 
+function _CC { tput setaf "${1}"; shift; printf '%s' "${*}"; tput sgr0; }
+function _CO { _CC 2 "$1"; [[ -n "$2" ]] && printf ', ' && tput setaf 2 && _CC 2 "$2"; }
+
 SCRIPT="${0##*/}"
 VERSION="0.0.1"
+LABEL="$(_CC 2 "${SCRIPT}") v${VERSION}"
+VERBOSE=0
+CMD_SYNTAX='confsubst [OPTION] [--] (DIR | FILE...)'
+
 # -----------------------------------
 function log {
   local FUN="${FUNCNAME[1]}"
   local LNR="${BASH_LINENO[0]}"
   local KEY=" [${SCRIPT}:${LNR}]:(${FUN}):"
-  local MSG="$KEY$*"
+  local MSG="[INFO] ${KEY}${*}"
   local MOD="$1"
   local FIN=0
+  local LOG=0
+  local COL="$MOD"
   if [[ $MOD == ?(-)+([0-9]) ]]; then
     shift
-    MSG="$KEY$*"
-    (( "$MOD" > 10 )) && FIN=1 && MSG="[ERROR:${MOD}] ${MSG}" && echo "$MSG"
-    (( "$MOD" > 4 && "$MOD" < 10 )) && MSG="[WARN:${MOD}] ${MSG}" && echo "$MSG"
-    (( "$MOD" < 4 )) && MSG="[TRACE:${MOD}] ${MSG}"
+    MSG="${KEY}${*}"
+    (( "$MOD" >= 10 )) && MSG="[ERROR:${MOD}] ${MSG}" && FIN=1 && LOG=1 && COL=1
+    (( "$MOD" >= 4 && "$MOD" < 10 )) && MSG="[WARN:${MOD}] ${MSG}" && LOG=1 && COL=3
+    (( "$MOD" < 4 )) && MSG="[TRACE:${MOD}] ${MSG}" && COL=2
   fi
+
   echo "$MSG" >> /tmp/mxsh.log
+
+  ( (( "$LOG" )) || (( "$VERBOSE" )) ) && _CC "$COL" "$MSG" $'\n'
   (( "$FIN" )) && exit "$MOD"
 }
 
+function print_version { echo "${LABEL}" && exit; }
+
+function print_help {
+cat << EOM
+${LABEL}
+(C) 2024 Yan<metaory@gmail.com
+
+confsubst - templating and variable interpolation cli utility
+
+$(_CC 3 USAGE:)
+=====
+  $(_CC 1 "$CMD_SYNTAX")
+  Substitute placeholders in file(s)
+
+$(_CC 3 OPTIONS)
+=======
+  $(_CO -e  '--env FILE')     explicitly set env path
+  $(_CO -o  '--output DIR')   explicitly set output path
+
+  $(_CO -M  --no-modeline)  dont parse modelines
+  $(_CO -H  --no-hook)      dont run pre/post hooks
+  $(_CO -d --dryrun)       dont change anything
+  $(_CO -f  --force)        forcefull update
+  $(_CO -n --quiet)        suppress all messages
+
+  $(_CO -v --version)      display this help and exit
+  $(_CO -h --help)         display this help and exit
+
+  $(_CO --verbose)          be more verbose
+  $(_CO --debug)            annotate program execution
+EOM
+exit
+}
+
 while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do case $1 in
-  -V | --version ) echo "v${VERSION}" && exit ;;
-  # -s | --string ) shift; string=$1; ;;
+  -v | --version ) print_version ;;
+  -h | --help ) print_help ;;
+  --verbose ) shift; VERBOSE=1; ;;
   # -f | --flag ) flag=1; ;;
 esac; shift; done
 if [[ "$1" == '--' ]]; then shift; fi
-
-log "there is $# args"
-if (( "$#" == 0 )); then
-  log 5 'confsubst requires at least one file to start'
-  log 5 'operate on current path?'
-  log 5 "$PWD"
-  exit
-fi
 
 while [ "$1" ]; do
   log "doing one: $1"
   shift
 done
 
-log 'done with all'
+# log 'done with all'
+(( "$#" == 0 )) && _CC 3 "\$ ${CMD_SYNTAX}" $'\n' && log 10 $'\n confsubst requires at least one file or dir'
+command -v envsubst &> /dev/null || log 11 'gnu envsubst command not found (provided by gnu gettext)'
+command -v printenv &> /dev/null || log 11 'gnu printenv command not found (provided by gnu coreutils)'
+
 # templates="$(find templates/* -type f 2> /dev/null)"
 
 # ! [[ -d ./templates ]] && log 5 'no files found'
@@ -79,13 +122,13 @@ function get_mode_data {
   # local name
   local dest
   while read -r line; do
-    if (( $(expr "$line" : '.*mxc:') )); then
-      # name="$(sed -r 's/.*mxc:.*name=(.*)( |$).*/\1/' <<< "$line")"
-      dest="$(sed -r 's/.*mxc:.*dest=(.*)( |$).*/\1/' <<< "$line")"
-      # prt "  [name: $name] [dest: $dest]"
-      echo "${dest}"
-      break
-    fi
+	if (( $(expr "$line" : '.*mxc:') )); then
+	  # name="$(sed -r 's/.*mxc:.*name=(.*)( |$).*/\1/' <<< "$line")"
+	  dest="$(sed -r 's/.*mxc:.*dest=(.*)( |$).*/\1/' <<< "$line")"
+	  # prt "  [name: $name] [dest: $dest]"
+	  echo "${dest}"
+	  break
+	fi
   done <"$1"
 }
 
@@ -94,23 +137,23 @@ function generate {
 
   for tpl in $templates; do
 
-    local file="${tpl##*/}"
-    local dest
+	local file="${tpl##*/}"
+	local dest
 
-    dest="$(get_mode_data "$tpl")"
-    dest="${dest:-/tmp/mxc/$file}"
+	dest="$(get_mode_data "$tpl")"
+	dest="${dest:-/tmp/mxc/$file}"
 
-    prt " ($tpl::$file)"
-    prt " SRC:$file -> DST:$dest"
+	prt " ($tpl::$file)"
+	prt " SRC:$file -> DST:$dest"
 
-    # envsubst < "$tpl" | tee \
-    #   >(cat > /tmp/mxc/"$file") \
-    #   >(cat > "./output/$file") &> /dev/null
+	# envsubst < "$tpl" | tee \
+	#   >(cat > /tmp/mxc/"$file") \
+	#   >(cat > "./output/$file") &> /dev/null
 
-    done
-  }
+  done
+}
 
-  generate
+generate
 
 
 # Stext="Hallo World mxc: dest=/tmp/foo/xorg.xs foo bar"
@@ -150,3 +193,36 @@ function generate {
 # # expr "$stringZ" : '\(.[b-c]*[A-Z]..[0-9]\)' # abcABC1
 # # expr "$stringZ" : '\(.[b-c]*[A-Z]..[0-9]\)' # abcABC1
 # # expr "$stringZ" : '\(.......\)'             # abcABC1
+
+# for CONFIG in $(
+# 	find ./ -maxdepth 1 \
+# 		-type d \
+# 		-not -name '*bak' \
+# 		-not -name '.*' \
+# 		-not -name 'theme-*' \
+# 		-not -name 'workstation-*' \
+# 		-not -name '_*' \
+# 		-not -name 'src' \
+# 		-not -name 'pkg' \
+# 		-exec basename {} \; ;
+# 	echo "$PC_NAME"
+# ); do
+# 	echo -n "${CONFIG}: " ;
+# 	if stow "$CONFIG"; then
+# 		green "ok"
+# 	else
+# 		red "FAILED"
+# 	fi
+# done
+#
+# echo
+# purp ":: Changing the theme to $(cyan "$THEME_NAME"):"
+# "$SCRIPT_DIR"/change-theme.sh "$THEME_NAME"
+# green ":: Bootstrapped successfully"
+#
+# log 1 foo_1
+# log 2 foo_2
+# log 5 foo_5
+# log 8 foo_8
+# log 11 foo_11
+
