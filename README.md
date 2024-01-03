@@ -208,8 +208,9 @@ The **modeline** and **all** its keys are **optional**
 
 Real world example in conf file
 
-`mxc: label=kitty_theme path=~/.config/kitty/kitty-theme.conf post=~/bin/reload_kitty.sh`
+`# mxc: label=kitty_theme path=~/.config/kitty/kitty-theme.conf post=~/bin/reload_kitty.sh`
 
+`; mxc: label=xresources path=~/.Xresources post=~/bin/merge_xrdb.sh`
 ---
 
 ## Environments
@@ -263,6 +264,7 @@ C08='#445566'
 
 `cat wezterm_color.lua`
 ```lua
+-- mxc: path=~/.config/wezterm/wez_color.lua
 return {
   foreground = "$XFG",
   background = "$XBG",
@@ -282,6 +284,8 @@ return {
 
 `cat kitty-theme.conf`
 ```conf
+# mxc: path=~/.config/kitty/kitty-theme.conf post=~/bin/reload_kitty.sh
+
 background $XBG
 foreground $XFG
 color0     $C00
@@ -294,7 +298,6 @@ color6     $C06
 color7     $C07
 color8     $C08
 ```
----
 
 ---
 
