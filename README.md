@@ -283,7 +283,7 @@ return {
 ```
 
 `cat kitty-theme.conf`
-```conf
+```ini
 # mxc: path=~/.config/kitty/kitty-theme.conf post=~/bin/reload_kitty.sh
 
 background $XBG
