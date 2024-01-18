@@ -44,7 +44,10 @@ confsubst --help
 confsubst kitty-theme-template.conf nvim-colors.lua
 
 # Explicitly set env and output path
-confsubst -e ~/dummy/.env -o ~/output kitty-theme-template.conf nvim-colors.lua
+confsubst -e ~/dummy/.env  kitty-theme-template.conf nvim-colors.lua
+
+# Render all files in mytemplate directory
+confsubst -e ~/dummy/.env  mytemplate/
 ```
 
 ---
