@@ -1,228 +1,165 @@
 #!/bin/bash
 
-# shellcheck disable=SC2317
-# shellcheck disable=SC2154
-# shellcheck disable=SC2034
+# #### ############ ########################################
+# #### INFO: [VARS] ########################################
+# #### ############
+declare -a FILES
+SCRIPT="${0##*/}"
+ENVFILE='.env'
+VERSION="0.0.1"
+VERBOSE=0
+LOGFILE=/tmp/mxsh.log
+CMD_SYNTAX='confsubst [-elVvh] [--] [-]|DIR|FILE...'
 
-# shellcheck source=/dev/null
-# . "$MXLIB/lib.log.sh"
+# #### ################### #################################
+# #### INFO: [CONFIG_MAPS] #################################
+# #### ###################
+declare -A COL_MAP=( [0]=6 [1]=2 [2]=4 [3]=3 [4]=1 )
+declare -A LBL_MAP=( [0]=TRACE [1]=OK [2]=INFO [3]=WARN [4]=ERROR )
 
+# #### ############## ######################################
+# #### INFO: [PRINTS] ######################################
+# #### ##############
 function _CC { tput setaf "${1}"; shift; printf '%s' "${*}"; tput sgr0; }
 function _CO { _CC 2 "$1"; [[ -n "$2" ]] && printf ', ' && tput setaf 2 && _CC 2 "$2"; }
 
-SCRIPT="${0##*/}"
-VERSION="0.0.1"
-LABEL="$(_CC 2 "${SCRIPT}") v${VERSION}"
-VERBOSE=0
-CMD_SYNTAX='confsubst [OPTION] [--] (DIR | FILE...)'
+# ----------------------------------------------------------
 
-# -----------------------------------
 function log {
-  local FUN="${FUNCNAME[1]}"
-  local LNR="${BASH_LINENO[0]}"
-  local KEY=" [${SCRIPT}:${LNR}]:(${FUN}):"
-  local MSG="[INFO] ${KEY}${*}"
-  local MOD="$1"
-  local FIN=0
-  local LOG=0
-  local COL="$MOD"
-  if [[ $MOD == ?(-)+([0-9]) ]]; then
-    shift
-    MSG="${KEY}${*}"
-    (( "$MOD" >= 10 )) && MSG="[ERROR:${MOD}] ${MSG}" && FIN=1 && LOG=1 && COL=1
-    (( "$MOD" >= 4 && "$MOD" < 10 )) && MSG="[WARN:${MOD}] ${MSG}" && LOG=1 && COL=3
-    (( "$MOD" < 4 )) && MSG="[TRACE:${MOD}] ${MSG}" && COL=2
-  fi
-
-  echo "$MSG" >> /tmp/mxsh.log
-
-  ( (( "$LOG" )) || (( "$VERBOSE" )) ) && _CC "$COL" "$MSG" $'\n'
-  (( "$FIN" )) && exit "$MOD"
+  (( "$VERBOSE" )) && printf -v VRB '[%s:%s:%03d]' "${FUNCNAME[1]}" "${SCRIPT}" "${BASH_LINENO[0]}"
+  printf '%s%s %s\n' "$(_CC "${COL_MAP[${1}]}" "[${LBL_MAP[${1}]:-N}]")" "${VRB:-}" "${*:2}" | \
+    tee "$LOGFILE"
+  (( "$1" >= 4 )) && exit "$1"
 }
 
-function print_version { echo "${LABEL}" && exit; }
+# ----------------------------------------------------------
 
-function print_help {
-cat << EOM
-${LABEL}
+function version_exit { echo "$(_CC 2 "${SCRIPT}") ${VERSION}" ; exit; }
+
+# ----------------------------------------------------------
+
+function badarg_exit {
+  _CC 2 ': confsubst expects'
+  _CC 3 $' [-]|DIR|FILE...\n\n'
+  _CC 4  $'\n$ confsubst --help\n\n'
+  _CC 2 "\$ ${CMD_SYNTAX}"
+  exit
+}
+
+# ----------------------------------------------------------
+
+function help_exit {
+  cat << EOM
+$(version_exit)
 (C) 2024 Yan<metaory@gmail.com
 
-confsubst - templating and variable interpolation cli utility
+confsubst - templating and variable interpolation CLI utility
 
 $(_CC 3 USAGE:)
 =====
-  $(_CC 1 "$CMD_SYNTAX")
+$(_CC 1 "$CMD_SYNTAX")
   Substitute placeholders in file(s)
+
+  $(_CC 4 'With no DIR|FILE..., or when FILE is [-], read STDIN')
 
 $(_CC 3 OPTIONS)
 =======
-  $(_CO -e  '--env FILE')     explicitly set env path
-  $(_CO -o  '--output DIR')   explicitly set output path
-
-  $(_CO -M  --no-modeline)  dont parse modelines
-  $(_CO -H  --no-hook)      dont run pre/post hooks
-  $(_CO -d --dryrun)       dont change anything
-  $(_CO -f  --force)        forcefull update
-  $(_CO -n --quiet)        suppress all messages
-
-  $(_CO -v --version)      display this help and exit
-  $(_CO -h --help)         display this help and exit
-
-  $(_CO --verbose)          be more verbose
-  $(_CO --debug)            annotate program execution
+  $(_CO -e '--env <FILE>')  environment overrides
+  $(_CO -l --logfile)     verbose log file
+  $(_CO -V --verbose)     be more verbose
+  $(_CO -h --help)        display this help and exit
+  $(_CO -v --version)     display version and exit
 EOM
+  # $(_CO -f --force)           replace existing destination files
+  # $(_CO -I --ignore-modeline) ignore any modeline
 exit
 }
 
-while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do case $1 in
-  -v | --version ) print_version ;;
-  -h | --help ) print_help ;;
-  --verbose ) shift; VERBOSE=1; ;;
-  # -f | --flag ) flag=1; ;;
-esac; shift; done
-if [[ "$1" == '--' ]]; then shift; fi
+# #### ############# #######################################
+# #### INFO: [PARSE] #######################################
+# #### #############
+declare -A MOD_OPT
 
-while [ "$1" ]; do
-  log "doing one: $1"
-  shift
-done
-
-# log 'done with all'
-(( "$#" == 0 )) && _CC 3 "\$ ${CMD_SYNTAX}" $'\n' && log 10 $'\n confsubst requires at least one file or dir'
-command -v envsubst &> /dev/null || log 11 'gnu envsubst command not found (provided by gnu gettext)'
-command -v printenv &> /dev/null || log 11 'gnu printenv command not found (provided by gnu coreutils)'
-
-# templates="$(find templates/* -type f 2> /dev/null)"
-
-# ! [[ -d ./templates ]] && log 5 'no files found'
-
-# ! [[ -f ./.env ]] && log 3 '.env file not found'
-
-# [[ -z "$templates" ]] && log 7 'cant find any templates' && exit 1
-
-# mkdir output /tmp/mxc &> /dev/null
-
-
-
-
-
-
-
-exit
-
-if [[ -f ./.env ]]; then
-  log 5 '.env file not found'
-  source .env
-else
-  log 3 '.env file not found'
-fi
-
-function get_mode_data {
-  # local mode
-  # local name
-  local dest
-  while read -r line; do
-	if (( $(expr "$line" : '.*mxc:') )); then
-	  # name="$(sed -r 's/.*mxc:.*name=(.*)( |$).*/\1/' <<< "$line")"
-	  dest="$(sed -r 's/.*mxc:.*dest=(.*)( |$).*/\1/' <<< "$line")"
-	  # prt "  [name: $name] [dest: $dest]"
-	  echo "${dest}"
-	  break
-	fi
+function set_mode_data {
+  MOD_OPT=()
+  while read -r L; do
+    ! [[ $L =~ .*mx([c])?: ]] && continue
+    while [[ $L =~ ([a-z]+)=([a-z0-9\/\-]+) ]]; do
+      MOD_OPT["${BASH_REMATCH[1]}"]="${BASH_REMATCH[2]}"
+      L=${L/"${BASH_REMATCH[0]}"/}
+    done
   done <"$1"
 }
 
-function generate {
-  # for tpl_path in *; do
+# #### ########################## ##########################
+# #### INFO: [REQUIREMENT CHECKS] ##########################
+# #### ##########################
+command -v envsubst &> /dev/null || log 11 'gnu envsubst command not found (provided by gnu gettext)'
+command -v printenv &> /dev/null || log 11 'gnu printenv command not found (provided by gnu coreutils)'
 
-  for tpl in $templates; do
+# #### ################## ##################################
+# #### INFO: [READ.STDIN] #######################################
+# #### ##################
+function readstdin { [ ! -t 0 ] && while read -r x ; do FILES+=( "$x" ) ; done; }
 
-	local file="${tpl##*/}"
-	local dest
+# #### ################# ###################################
+# #### INFO: [READ.ARGS] ########################################
+# #### #################
+function readarg {
+  while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do case $1 in
+    -e | --env     ) ENVFILE="$2"; shift ;;
+    -l | --logfile ) LOGFILE="$2"; shift ;;
+    -V | --verbose ) VERBOSE=1    ;;
+    -v | --version ) version_exit ;;
+    -h | --help    ) help_exit    ;;
+    --             ) break        ;;
+    -              ) readstdin    ;;
+    *              ) badarg_exit  ;;
+  esac; shift; done
 
-	dest="$(get_mode_data "$tpl")"
-	dest="${dest:-/tmp/mxc/$file}"
-
-	prt " ($tpl::$file)"
-	prt " SRC:$file -> DST:$dest"
-
-	# envsubst < "$tpl" | tee \
-	#   >(cat > /tmp/mxc/"$file") \
-	#   >(cat > "./output/$file") &> /dev/null
-
+  for input in "${@}"; do
+    [[ -f "$input" ]] && FILES+=( "$input" )
+    [[ -d "$input" ]] && mapfile -t tmp < <(find "$input" -type f) || tmp=( )
+    FILES+=("${tmp[@]}")
   done
 }
 
-generate
+# shellcheck source=/dev/null
+function readenv { [[ -f $ENVFILE ]] && source "$ENVFILE"; }
 
+# #### ############### #####################################
+# #### INFO: [PROCESS] #####################################
+# #### ###############
+function process {
+  ! (( "${#FILES[@]}" )) && badarg_exit
 
-# Stext="Hallo World mxc: dest=/tmp/foo/xorg.xs foo bar"
-# mode="$(sed -r 's/.*mxc: (.*)/\1/' <<< "$Stext")"
-# dest="$(sed -r 's/.*dest=(.*) .*/\1/' <<< "$Stext")"
-# prt "$mode $dest"
+  mkdir /tmp/mxc &> /dev/null
 
-# data="$(cat templates/dummy.xdefaults)"
-# echo "data :: $data"
+  for F in "${FILES[@]}"; do
+    local T="/tmp/mxc/${F#*/}"
+    set_mode_data "$F"
 
-# expr "$Stext" : '^\(.[a-z]*\)' # Hallo
-# expr "$Stext" : '.*World'      # 11
-# expr "$Stext" : '.*mxc:'
-# echo '---------------------------------'
-# echo "$Stext"
-# echo '======'
-# expr "$Stext" : '\(.dest=.*\)'
-#
-# expr "$Stext" : '^\(.[a-z]*\)' # Hallo
-# expr "$Stext" : '^.[a-z]*' # 5
-# expr "$Stext" : '\(.*World\)' # Hallo World
-# expr "$Stext" : '.*World' # 11
-# echo '##########'
-# Stext="Hallo World mxc: dest=tmpfooxorg.xs foo bar"
-# expr "$Stext" : '.*mxc:\(.*dest=\([0-9a-z.\/]+\)\)'
-# echo 'here:::'
-# expr "$Stext" : '.*dest=\(.*[0-9a-z\.\/]\)'
-# expr "$Stext" : '.*dest=\([a-b].*\) '
-# echo '@@@@@'
-# expr "$Stext" : '.*\(mxc.*\)'
-#
-# # expr "$Stext" : '\(.*mxc\)' # abcABC1
-# # expr "$Stext" : '.*\(dest=\([a-z]\)\)'
-#
-#
-# # stringZ=$Stext
-# # expr "$stringZ" : '\(.[b-c]*[A-Z]..[0-9]\)' # abcABC1
-# # expr "$stringZ" : '\(.[b-c]*[A-Z]..[0-9]\)' # abcABC1
-# # expr "$stringZ" : '\(.......\)'             # abcABC1
+    log 2 "TP FILE" "$F"
+    log 2 "MOD_OPT" "$(declare -p MOD_OPT)"
 
-# for CONFIG in $(
-# 	find ./ -maxdepth 1 \
-# 		-type d \
-# 		-not -name '*bak' \
-# 		-not -name '.*' \
-# 		-not -name 'theme-*' \
-# 		-not -name 'workstation-*' \
-# 		-not -name '_*' \
-# 		-not -name 'src' \
-# 		-not -name 'pkg' \
-# 		-exec basename {} \; ;
-# 	echo "$PC_NAME"
-# ); do
-# 	echo -n "${CONFIG}: " ;
-# 	if stow "$CONFIG"; then
-# 		green "ok"
-# 	else
-# 		red "FAILED"
-# 	fi
-# done
-#
-# echo
-# purp ":: Changing the theme to $(cyan "$THEME_NAME"):"
-# "$SCRIPT_DIR"/change-theme.sh "$THEME_NAME"
-# green ":: Bootstrapped successfully"
-#
-# log 1 foo_1
-# log 2 foo_2
-# log 5 foo_5
-# log 8 foo_8
-# log 11 foo_11
+    envsubst < "${F}" | tee \
+      "${T}" \
+      "${MOD_OPT[path]:-/dev/null}" &> /dev/null
 
+    log 1 "Created" "$T"
+    log 1 "Updated" "$F"
+    echo
+  done
+}
+
+# #### ############ ########################################
+# #### INFO: [MAIN] ########################################
+# #### ############
+function main {
+  readarg "$@"
+  readstdin
+  readenv
+  process
+}
+
+main "$@"

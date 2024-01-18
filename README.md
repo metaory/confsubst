@@ -1,16 +1,18 @@
 # confsubst [WIP]
 
-#### Templating and Variable Interpolation CLI Utility for any file
+#### Templating and Variable Interpolation CLI Utility
 
-##### ● Substitutes Config Placeholders
-##### ● Run Pre/Post Hooks
-##### ● Self-contained Options with modeline like syntax
+##### Render `STDIN|DIR|FILE...` with `[-e <FILE>]|env`
+
+###### ● Substitutes Files Placeholders
+###### ● Self-contained Options with modeline like syntax
+###### ● ~~Pre/Post Hooks~~
 
 ## Features
--  `.env` to override environment
+-  `[-e <FILE>]` to override environment
 -  `modeline` like syntax for optional _self-contained*_ file settings
--  `Pre`/`Post` hooks for other custom pre/post processing
--  `Path` for replacing existing file
+-  `pre`/`post` hooks for other custom pre/post processing
+-  `path` for replacing existing file
 
 ---
 
@@ -49,27 +51,20 @@ confsubst -e ~/dummy/.env -o ~/output kitty-theme-template.conf nvim-colors.lua
 
 ## Usage
 ```md
-USAGE
+USAGE:
 =====
-  confsubst [OPTIONS] [--] (DIR | FILE...)
-  substitute placeholders in file(s)
+confsubst [--elVvh] [--] [-]|DIR|FILE...
+  Substitute placeholders in file(s)
+
+  With no DIR|FILE..., or when FILE is [-], read STDIN
 
 OPTIONS
 =======
-  -e, --env FILE     explicitly set env path
-  -o, --output DIR   explicitly set output path
-
-  -H, --no-modeline  dont parse modelines
-  -H, --no-hook      dont run pre/post hooks
-  -d, --dryrun       dont change anything
-  -f, --force        forcefull update
-  -n, --quiet        suppress all messages
-
-  -v, --version      display this help and exit
-  -h, --help         display this help and exit
-
-  --verbose          be more verbose
-  --debug            annotate program execution
+  -e, --env <FILE>  environment overrides
+  -l, --logfile     verbose log file
+  -V, --verbose     be more verbose
+  -h, --help        display this help and exit
+  -v, --version     display version and exit
 ```
 
 ---
@@ -138,7 +133,7 @@ A post hook to do clean up, reload apps config, or run any other post steps.
 
 > An Optional Vim like syntax to define file settings
 
-> `[text{white}]{mx:|mxc:|mxconf:}[white]{options}`
+> `[text{white}]{mx:|mxc:}[white]{options}`
 
 #### Exec Pre Hook
 
@@ -188,10 +183,10 @@ The **modeline** follows similar syntax to the first form of (n)Vim modeline [:h
 The **modeline** and **all** its keys are **optional**
 
 ```cpp
-[text{white}]{mx:|mxc:|mxconf:}[white]{options}
+[text{white}]{mx:|mxc:}[white]{options}
 
 [text{white}]       empty or any text followed by at least one blank character (<Space> or <Tab>)
-{mx:|mxc:|mxconf:}  the string "mx:", "mxc:" or "mxconf:"
+{mx:|mxc:}          the string "mx:", "mxc:" or "mxconf:"
 [white]             optional white space
 {options}           a list of key-value options, separated with white space
 ```
@@ -204,13 +199,11 @@ The **modeline** and **all** its keys are **optional**
 
 ###### Example modeline:
 
-`mxc: label=[label] path={dest_path} pre=[script_path] post=[script_path]`
+`# mxc: label=[label] path={dest_path} pre=[script_path] post=[script_path]`
 
-Real world example in conf file
+`// mxc: label=kitty_theme path=~/.config/kitty/kitty-theme.conf post=~/bin/reload_kitty.sh`
 
-`# mxc: label=kitty_theme path=~/.config/kitty/kitty-theme.conf post=~/bin/reload_kitty.sh`
-
-`; mxc: label=xresources path=~/.Xresources post=~/bin/merge_xrdb.sh`
+`; mx: label=xresources path=~/.Xresources post=~/bin/merge_xrdb.sh`
 
 ---
 
@@ -311,15 +304,15 @@ All of Current requirements are part of the [base](https://archlinux.org/package
 
 # Optional Requirements
 
-- [Pastel](https://github.com/sharkdp/pastel) - color preview
+- ~~[Pastel](https://github.com/sharkdp/pastel) - color preview~~
 
 ---
 
 # TODOs
 
-- [ ] variable substitution
-- [ ] handle directories
-- [ ] parse modeline
+- [x] variable substitution
+- [x] handle directories
+- [x] parse modeline
 - [ ] pre/post hooks
 - [ ] inline hooks
 
