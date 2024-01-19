@@ -9,7 +9,8 @@ ENVFILE='.env'
 VERSION="0.0.1"
 VERBOSE=0
 LOGFILE=/tmp/mxsh.log
-CMD_SYNTAX='confsubst [-elVvh] [--] [-]|DIR|FILE...'
+OUTPUT=/tmp/mxc
+CMD_SYNTAX='confsubst [-elVvh] [-o DIR] [--] [-]|DIR|FILE...'
 
 # #### ################### #################################
 # #### INFO: [CONFIG_MAPS] #################################
@@ -64,11 +65,12 @@ $(_CC 1 "$CMD_SYNTAX")
 
 $(_CC 3 OPTIONS)
 =======
-  $(_CO -e '--env <FILE>')  environment overrides
-  $(_CO -l --logfile)     verbose log file
-  $(_CO -V --verbose)     be more verbose
-  $(_CO -h --help)        display this help and exit
-  $(_CO -v --version)     display version and exit
+  $(_CO -e '--env <FILE>')   environment overrides
+  $(_CO -o '--output <DIR>') output path
+  $(_CO -l '--log <FILE>')   verbose log file
+  $(_CO -V --verbose)      be more verbose
+  $(_CO -h --help)         display this help and exit
+  $(_CO -v --version)      display version and exit
 EOM
   # $(_CO -f --force)           replace existing destination files
   # $(_CO -I --ignore-modeline) ignore any modeline
@@ -108,7 +110,8 @@ function readstdin { [ ! -t 0 ] && while read -r x ; do FILES+=( "$x" ) ; done; 
 function readarg {
   while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do case $1 in
     -e | --env     ) ENVFILE="$2"; shift ;;
-    -l | --logfile ) LOGFILE="$2"; shift ;;
+    -o | --output  ) OUTPUT="$2";  shift ;;
+    -l | --log     ) LOGFILE="$2"; shift ;;
     -V | --verbose ) VERBOSE=1    ;;
     -v | --version ) version_exit ;;
     -h | --help    ) help_exit    ;;
@@ -133,10 +136,10 @@ function readenv { [[ -f $ENVFILE ]] && source "$ENVFILE"; }
 function process {
   ! (( "${#FILES[@]}" )) && badarg_exit
 
-  mkdir /tmp/mxc &> /dev/null
+  mkdir "$OUTPUT" &> /dev/null
 
   for F in "${FILES[@]}"; do
-    local T="/tmp/mxc/${F#*/}"
+    local T="${OUTPUT}/${F#*/}"
     set_mode_data "$F"
 
     log 2 "TP FILE" "$F"

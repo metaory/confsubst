@@ -3,6 +3,8 @@
 #### Templating and Variable Interpolation CLI Utility
 
 ##### Render `STDIN|DIR|FILE...` with `[-e <FILE>]|env`
+`confsubst [--elVvh] [-o DIR] [--] [-]|DIR|FILE...`
+Substitute placeholders in file(s)
 
 ###### ● Substitutes Files Placeholders
 ###### ● Self-contained Options with modeline like syntax
@@ -56,18 +58,19 @@ confsubst -e ~/dummy/.env  mytemplate/
 ```md
 USAGE:
 =====
-confsubst [--elVvh] [--] [-]|DIR|FILE...
+confsubst [--elVvh] [-o DIR] [--] [-]|DIR|FILE...
   Substitute placeholders in file(s)
 
   With no DIR|FILE..., or when FILE is [-], read STDIN
 
 OPTIONS
 =======
-  -e, --env <FILE>  environment overrides
-  -l, --logfile     verbose log file
-  -V, --verbose     be more verbose
-  -h, --help        display this help and exit
-  -v, --version     display version and exit
+  -e, --env <FILE>    environment overrides
+  -o, --output <FILE> verbose log file
+  -l, --log <FILE>    verbose log file
+  -V, --verbose       be more verbose
+  -h, --help          display this help and exit
+  -v, --version       display version and exit
 ```
 
 ---
