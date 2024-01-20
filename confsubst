@@ -86,8 +86,8 @@ function set_mode_data {
   MOD_OPT=()
   while read -r L; do
     ! [[ $L =~ .*mx([c])?: ]] && continue
-    while [[ $L =~ ([a-z]+)=([a-z0-9\/\-]+) ]]; do
-      MOD_OPT["${BASH_REMATCH[1]}"]="${BASH_REMATCH[2]}"
+    while [[ $L =~ ([a-z]+)=([A-Za-z0-9_\./\$]+) ]]; do
+      MOD_OPT["${BASH_REMATCH[1]}"]="$(envsubst <<< "${BASH_REMATCH[2]}")"
       L=${L/"${BASH_REMATCH[0]}"/}
     done
   done <"$1"
@@ -139,18 +139,18 @@ function process {
   mkdir "$OUTPUT" &> /dev/null
 
   for F in "${FILES[@]}"; do
-    local T="${OUTPUT}/${F#*/}"
     set_mode_data "$F"
 
-    log 2 "TP FILE" "$F"
-    log 2 "MOD_OPT" "$(declare -p MOD_OPT)"
+    local T="${OUTPUT}/${F#*/}"
+    local O="${MOD_OPT[path]:-/dev/null}"
 
-    envsubst < "${F}" | tee \
-      "${T}" \
-      "${MOD_OPT[path]:-/dev/null}" &> /dev/null
+    log 2 "$F"
+    log 0 "MOD_OPT" "$(declare -p MOD_OPT)"
 
-    log 1 "Created" "$T"
-    log 1 "Updated" "$F"
+    envsubst < "${F}" | tee  "${T}" "${O}" &> /dev/null
+
+    log 1 "[T] temp path   :" "$T"
+    log 1 "[O] output path :" "$O"
     echo
   done
 }
