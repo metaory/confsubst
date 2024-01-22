@@ -1,9 +1,11 @@
-# confsubst [WIP]
+# confsubst
 
 #### Templating and Variable Interpolation CLI Utility
 
 ##### Render `STDIN|DIR|FILE...` with `[-e <FILE>]|env`
+
 `confsubst [--elVvh] [-o DIR] [--] [-]|DIR|FILE...`
+
 Substitute placeholders in file(s)
 
 ###### ● Substitutes Files Placeholders
