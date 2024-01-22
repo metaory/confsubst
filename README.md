@@ -56,21 +56,31 @@ confsubst -e ~/dummy/.env  mytemplate/
 
 ## Usage
 ```md
-USAGE:
-=====
-confsubst [--elVvh] [-o DIR] [--] [-]|DIR|FILE...
-  Substitute placeholders in file(s)
+confsubst - templating and variable interpolation CLI utility
 
-  With no DIR|FILE..., or when FILE is [-], read STDIN
+USAGE
+=====
+ confsubst [-elVvqh] [-o DIR] [--] [-]|DIR|FILE...
+ With no DIR|FILE..., or when FILE is [-], read STDIN
 
 OPTIONS
 =======
-  -e, --env <FILE>    environment overrides
-  -o, --output <FILE> verbose log file
-  -l, --log <FILE>    verbose log file
-  -V, --verbose       be more verbose
-  -h, --help          display this help and exit
-  -v, --version       display version and exit
+  -e, --env <FILE>      environment overrides
+  -l, --log <FILE>      verbose log file
+  -o, --output <DIR>    output path
+  -V, --verbose         be more verbose
+  -q, --quiet, --silent inhibit the usual output
+  -h, --help            display this help and exit
+  -v, --version         display version and exit
+
+EXAMPLE
+=======
+$ confsubst templates
+$ confsubst templates/wezterm-color.lua templates/nvim-colors.lua
+$ confsubst -e .env -- templates
+$ confsubst --verbose templates
+$ confsubst -o myoutput - <(ls --zero | tr '\0' ' ')
+$ find . -type f -print0 | confsubst -l /tmp/mylog
 ```
 
 ---

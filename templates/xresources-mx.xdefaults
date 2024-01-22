@@ -1,3 +1,5 @@
+! mxc: path="$XDG_CONFIG_HOME/mxc/xresources-mx.xdefaults label=xres post='xrdb ~/.Xresources'
+
 ! # Add this line to your ~/.Xresources ##############
 ! #include "$HOME/.config/mxc/xresources-mx.xdefaults"
 ! ####################################################
