@@ -44,13 +44,13 @@ ln -sfv confsubst /usr/bin/confsubst
 # Usage help
 confsubst --help
 
- # Use .env in cwd or system env
-confsubst kitty-theme-template.conf nvim-colors.lua
+# Render two templates
+# With no -e, --env system environment variable is used
+# With no -o, --output rendered templates will go to /tmp/mxc/*
+# With modeline path present in template file rendered template will be copied
+confsubst templates/wezterm-color.lua templates/nvim-colors.lua
 
-# Explicitly set env and output path
-confsubst -e ~/dummy/.env  kitty-theme-template.conf nvim-colors.lua
-
-# Render all files in mytemplate directory
+# Render all files in mytemplate directory rendered with merged variables of ~/dummy/.env
 confsubst -e ~/dummy/.env  mytemplate/
 ```
 
@@ -98,7 +98,7 @@ $ find . -type f -print0 | confsubst -l /tmp/mylog
 `Post Hook` to then **restart** some service or app
 
 #### Update Colorscheme System Wide
-To easily substitute colorscheme variables in different applications with different formats
+Substitute colorscheme variables in different applications with different formats
 
 For example:
 - terminal colorscheme config
@@ -204,7 +204,7 @@ The **modeline** and **all** its keys are **optional**
 [text{white}]{mx:|mxc:}[white]{options}
 
 [text{white}]       empty or any text followed by at least one blank character (<Space> or <Tab>)
-{mx:|mxc:}          the string "mx:", "mxc:" or "mxconf:"
+{mx:|mxc:}          the string "mx:" or "mxc:"
 [white]             optional white space
 {options}           a list of key-value options, separated with white space
 ```
@@ -219,7 +219,7 @@ The **modeline** and **all** its keys are **optional**
 
 `# mxc: label=[label] path={dest_path} pre=[script_path] post=[script_path]`
 
-`// mxc: label=kitty_theme path=~/.config/kitty/kitty-theme.conf post=~/bin/reload_kitty.sh`
+`// mxc: label=kitty_theme path=$XDG_CONFIG_HOME/kitty/kitty-theme.conf post=~/bin/reload_kitty.sh`
 
 `; mx: label=xresources path=~/.Xresources post=~/bin/merge_xrdb.sh`
 
@@ -244,7 +244,7 @@ SOME_NUM=2200
 SOME_BOOL=true
 ```
 
-## Sample config files
+## Sample template files
 
 ```bash
 ls -a .
@@ -296,7 +296,7 @@ return {
 
 `cat kitty-theme.conf`
 ```ini
-# mxc: path=~/.config/kitty/kitty-theme.conf post=~/bin/reload_kitty.sh
+# mxc: path=$XDG_CONFIG_HOME/kitty/kitty-theme.conf post=~/bin/reload_kitty.sh
 
 background $XBG
 foreground $XFG
