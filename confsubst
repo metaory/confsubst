@@ -22,6 +22,7 @@ declare -A LBL_MAP=( [0]=TRACE [1]=OK [2]=INFO [3]=WARN [4]=ERROR )
 # #### INFO: [PRINTS] ######################################
 # #### ##############
 declare -g "_CX"="$(tput sgr0)"
+declare -g "_CB"="$(tput bold)"
 for i in {1..10}; do declare -g "_C${i}"="$(tput setaf "${i}")"; done
 
 function _CC { tput setaf "${1}"; shift; printf '%s' "${*}"; tput sgr0; }
@@ -56,9 +57,7 @@ function log_expand {
 
 # ----------------------------------------------------------
 
-function print_syntax {
-  _CC 2 " confsubst [-elVvqh] [-o DIR] [--] $(tput bold)[-]|DIR|FILE...$(tput sgr0)" $'\n'
-}
+function print_syntax { _CC 2 " confsubst [-elVvqh] [-o DIR] [--] ${_CB}[-]|DIR|FILE...${_CX}" $'\n'; }
 function print_version { _CC 2 "${SCRIPT}" "${VERSION}"; }
 
 # ----------------------------------------------------------
