@@ -1,10 +1,60 @@
-# confsubst
+CONFSUBST
+=========
+
+```bash
+NAME
+	confsubst - templating and variable interpolation CLI utility
+
+
+SYNOPSIS
+	confsubst [--elVvh] [-o DIR] [--] [-]|DIR|FILE...
+
+
+DESCRIPTION
+	with no DIR|FILE..., or when FILE is [-], read STDIN
+
+
+OPTIONS
+	e, --env <FILE>      environment overrides
+	l, --log <FILE>      verbose log file
+	o, --output <DIR>    output path
+	V, --verbose         be more verbose
+	q, --quiet, --silent inhibit the usual output
+	h, --help            display this help and exit
+	v, --version         display version and exit
+
+
+EXAMPLES
+	# substitute all files under templates/
+	confsubst templates
+
+	# substitute two files
+	confsubst templates/wezterm-color.lua templates/nvim-colors.lua
+
+	# substitute all files under templates/ override environment with .env file
+	confsubst -e .env -- templates
+
+	# substitute all files under templates/ with increased verbosity
+	confsubst --verbose templates
+
+	# substitute all files resulted from command and override output path
+	confsubst -o myoutput - <(ls --zero | tr '\0' ' ')
+
+	# substitute all files received as stdin and override log path
+	find . -type f -print0 | confsubst -l /tmp/mylog
+
+
+SEE ALSO
+	envsubst(1), env(1), environment(5), environ(7), sed(1), awk(1), grep(1), tr(1)
+
+
+AUTHOR
+	metaory <metaory@gmail.com>, Jan 2024
+```
 
 #### Templating and Variable Interpolation CLI Utility
 
 ##### Render `STDIN|DIR|FILE...` with `[-e <FILE>]|env`
-
-`confsubst [--elVvh] [-o DIR] [--] [-]|DIR|FILE...`
 
 Substitute placeholders in file(s)
 
@@ -52,51 +102,6 @@ confsubst templates/wezterm-color.lua templates/nvim-colors.lua
 
 # Render all files in mytemplate directory rendered with merged variables of ~/dummy/.env
 confsubst -e ~/dummy/.env  mytemplate/
-```
-
----
-
-## Usage
-```md
-confsubst - templating and variable interpolation CLI utility
-
-USAGE
-=====
- confsubst [-elVvqh] [-o DIR] [--] [-]|DIR|FILE...
- With no DIR|FILE..., or when FILE is [-], read STDIN
-
-OPTIONS
-=======
-  -e, --env <FILE>      environment overrides
-  -l, --log <FILE>      verbose log file
-  -o, --output <DIR>    output path
-  -V, --verbose         be more verbose
-  -q, --quiet, --silent inhibit the usual output
-  -h, --help            display this help and exit
-  -v, --version         display version and exit
-
-EXAMPLE
-=======
-```
-
-```bash
-# substitute all files under templates/
-confsubst templates
-
-# substitute two files
-confsubst templates/wezterm-color.lua templates/nvim-colors.lua
-
-# substitute all files under templates/ override environment with .env file
-confsubst -e .env -- templates
-
-# substitute all files under templates/ with increased verbosity
-confsubst --verbose templates
-
-# substitute all files resulted from command and override output path
-confsubst -o myoutput - <(ls --zero | tr '\0' ' ')
-
-# substitute all files received as stdin and override log path
-find . -type f -print0 | confsubst -l /tmp/mylog
 ```
 
 ---
