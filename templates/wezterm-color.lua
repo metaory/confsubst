@@ -4,6 +4,7 @@ local M = {}
 
 M.apply = function(cfg)
   cfg.color_scheme = "tokyonight_night"
+  cfg.force_reverse_video_cursor = true
   cfg.colors = {
     foreground = "$XFG",
     background = "$XBG",

@@ -77,18 +77,26 @@ OPTIONS
 
 EXAMPLE
 =======
-> substitute all files under templates/
-$ confsubst templates
-> substitute two files
-$ confsubst templates/wezterm-color.lua templates/nvim-colors.lua
-> substitute all files under templates/ override environment with .env file
-$ confsubst -e .env -- templates
-> substitute all files under templates/ with increased verbosity
-$ confsubst --verbose templates
-> substitute all files resulted from command and override output path
-$ confsubst -o myoutput - <(ls --zero | tr '\0' ' ')
-> substitute all files received as stdin and override log path
-$ find . -type f -print0 | confsubst -l /tmp/mylog
+```
+
+```bash
+# substitute all files under templates/
+confsubst templates
+
+# substitute two files
+confsubst templates/wezterm-color.lua templates/nvim-colors.lua
+
+# substitute all files under templates/ override environment with .env file
+confsubst -e .env -- templates
+
+# substitute all files under templates/ with increased verbosity
+confsubst --verbose templates
+
+# substitute all files resulted from command and override output path
+confsubst -o myoutput - <(ls --zero | tr '\0' ' ')
+
+# substitute all files received as stdin and override log path
+find . -type f -print0 | confsubst -l /tmp/mylog
 ```
 
 ---
