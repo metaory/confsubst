@@ -1,3 +1,4 @@
 .local/*
 .dev/*
 .env.local
+.env
