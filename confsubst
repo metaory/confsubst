@@ -165,7 +165,13 @@ function readarg {
 }
 
 # shellcheck source=/dev/null
-function readenv { [[ -f $ENVFILE ]] && source "$ENVFILE"; }
+function readenv {
+  [ -e "$ENVFILE" ] && source <(sed \
+    -e '/^\(\s*\)#.*/d' \
+    -e '/^$/d' \
+    -e 's/^\(\w.\+\)=/export \1=/' \
+    "$ENVFILE")
+}
 
 # #### ############### #####################################
 # #### INFO: [PROCESS] #####################################
@@ -178,15 +184,14 @@ function process {
 
     local T="${OUTPUT}/${F#*/}"
     local O="${MOD_OPT[path]:-/dev/null}"
-    # local L="${MOD_OPT[label]:-${F#*/}}"
 
-    echo "F $F"
-    echo "T $T"
-    echo "O $O"
-    echo "MOD_OPT ${MOD_OPT[*]}"
+    echo F "$F"
+    echo T "$T"
+    echo O "$O"
+    echo MOD_OPT "${MOD_OPT[*]}"
 
-    # envsubst < "${F}" | tee  "${T}" "${O}" &> /dev/null
     envsubst < "${F}" | tee  "${T}" "${O}" &> /dev/null
+
     ! (( SILENCE )) && printf '%s %s\n' "${_C3}[${C}/${#FILES[@]}]" "${_C4}${F}"
   done
 }
