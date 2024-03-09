@@ -1,7 +1,7 @@
 CONFSUBST
 =========
 
-```bash
+```ex
 NAME
 	confsubst - templating and variable interpolation CLI utility
 
@@ -76,7 +76,7 @@ Substitute placeholders in file(s)
 - give execution permissions
 - place it in your path
 
-```bash
+```ex
 # Clone the repo
 git clone git@github.com:metaory/confsubst.git
 
@@ -160,7 +160,7 @@ A post hook to do clean up, reload apps config, or run any other post steps.
 
 > Syntax: simple "KEY=VAL" pairs on separate lines:
 
-> ```bash
+> ```ex
 > MY_VAR_NAME=MY_VALUE
 > ```
 
@@ -255,7 +255,7 @@ _from the [coreutils](https://archlinux.org/packages/core/x86_64/coreutils/)_
 
 > Syntax: simple "KEY=VAL" pairs on separate lines: _[man pam_env.conf](https://man.archlinux.org/man/pam_env.conf.5.en#:~:text=Now%20some-,simple)_
 
-```bash
+```ex
 # .env
 SOME_VAR=FOO
 SOME_PATH="$HOME/.config/nvim/init.lua"
@@ -265,7 +265,7 @@ SOME_BOOL=true
 
 ## Sample template files
 
-```bash
+```ex
 ls -a .
 # .env
 # wezterm_color.lua
@@ -279,7 +279,7 @@ ls -a .
 ```
 
 `cat .env`
-```bash
+```ex
 XFG='#668899'
 XBG='#222233'
 C00='#333344'
@@ -314,7 +314,7 @@ return {
 ```
 
 `cat kitty-theme.conf`
-```ini
+```ex
 # mxc: path=$XDG_CONFIG_HOME/kitty/kitty-theme.conf post=~/bin/reload_kitty.sh
 
 background $XBG
