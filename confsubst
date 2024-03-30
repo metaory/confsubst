@@ -117,7 +117,7 @@ function set_mode_data {
   MOD_OPT=()
   while read -r L; do
     ! [[ $L =~ .*mx([c])?: ]] && continue
-    while [[ $L =~ ([a-z]+)=([A-Za-z0-9_\./\$]+) ]]; do
+    while [[ $L =~ ([a-z]+)=([a-zA-Z0-9_./$\-]+) ]]; do
       MOD_OPT["${BASH_REMATCH[1]}"]="$(envsubst <<< "${BASH_REMATCH[2]}")"
       L=${L/"${BASH_REMATCH[0]}"/}
     done
@@ -188,7 +188,7 @@ function process {
     echo F "$F"
     echo T "$T"
     echo O "$O"
-    echo MOD_OPT "${MOD_OPT[*]}"
+    echo M "${MOD_OPT[*]}"
 
     envsubst < "${F}" | tee  "${T}" "${O}" &> /dev/null
 

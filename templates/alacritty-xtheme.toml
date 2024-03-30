@@ -1,0 +1,88 @@
+# mxc: path=$XDG_CONFIG_HOME/alacritty/alacritty-xtheme.toml
+
+[colors.primary]
+foreground = "$XFG"
+background = "$XBG"
+# dim_foreground    = '#dbdbdb'
+# bright_foreground = '#d9d9d9'
+
+# [colors.cursor]
+# text = '#122637'
+# cursor = '#f0cb09'
+
+# Normal colors
+[colors.normal]
+red     = '$C01' # #f07178
+green   = '$C02' # #c3e88d
+yellow  = '$C03' # #ffcb6b
+blue    = '$C04' # #82aaff
+magenta = '$C05' # #c792ea
+cyan    = '$C06' # #89ddff
+black   = '$C00'
+white   = '$C07'
+
+# Bright colors
+[colors.bright]
+red     = '$C09' # '#ff8b92'
+green   = '$C10' # '#ddffa7'
+yellow  = '$C11' # '#ffe585'
+blue    = '$C12' # '#9cc4ff'
+magenta = '$C13' # '#e1acff'
+cyan    = '$C14' # '#a3f7ff'
+black   = '$C08'
+white   = '$C15'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+$C00
+$C08
+
+$C07
+$C15
+
+# background = "#221133"
+# background = "#4400aa"
+
+# M.apply = function(cfg)
+#   cfg.color_scheme = "tokyonight_night"
+#   cfg.force_reverse_video_cursor = true
+#   cfg.colors = {
+#     foreground = "$XFG",
+#     background = "$XBG",
+#     ansi = {
+#       "$C00",
+#       "$C01",
+#       "$C02",
+#       "$C03",
+#       "$C04",
+#       "$C05",
+#       "$C06",
+#       "$C07",
+#     },
+#     brights = {
+#       "$C08",
+#       "$C09",
+#       "$C10",
+#       "$C11",
+#       "$C12",
+#       "$C13",
+#       "$C14",
+#       "$C15",
+#     },
+#   }
+# end
+#
+# return M
