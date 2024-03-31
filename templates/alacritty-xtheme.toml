@@ -1,88 +1,77 @@
 # mxc: path=$XDG_CONFIG_HOME/alacritty/alacritty-xtheme.toml
 
+[colors]
+transparent_background_colors = true
+draw_bold_text_with_bright_colors = true
+
 [colors.primary]
-foreground = "$XFG"
-background = "$XBG"
+foreground = '$XFG'
+background = '$XBG'
 # dim_foreground    = '#dbdbdb'
 # bright_foreground = '#d9d9d9'
 
-# [colors.cursor]
-# text = '#122637'
-# cursor = '#f0cb09'
+[colors.hints.start]
+foreground = '#000000'
+background = '$C04'
 
-# Normal colors
+[colors.hints.end]
+foreground = '#000000'
+background = '$C05'
+
+[colors.selection]
+text   = '#000000'
+background = '$C04'
+
+[colors.footer_bar]
+foreground = '#000000'
+background = '$C04'
+
+[colors.search.matches]
+foreground = '#000000'
+background = '$C03'
+
+[colors.search.focused_match]
+foreground = '#000000'
+background = '$C01'
+
+[colors.line_indicator]
+foreground = '#000000'
+background = '$C03'
+
+[colors.vi_mode_cursor]
+text   = 'CellBackground'
+cursor = 'CellForeground'
+
+[colors.cursor]
+text   = 'CellBackground'
+cursor = 'CellForeground'
+
 [colors.normal]
-red     = '$C01' # #f07178
-green   = '$C02' # #c3e88d
-yellow  = '$C03' # #ffcb6b
-blue    = '$C04' # #82aaff
-magenta = '$C05' # #c792ea
-cyan    = '$C06' # #89ddff
+red     = '$C01'
+green   = '$C02'
+yellow  = '$C03'
+blue    = '$C04'
+magenta = '$C05'
+cyan    = '$C06'
 black   = '$C00'
 white   = '$C07'
 
-# Bright colors
 [colors.bright]
-red     = '$C09' # '#ff8b92'
-green   = '$C10' # '#ddffa7'
-yellow  = '$C11' # '#ffe585'
-blue    = '$C12' # '#9cc4ff'
-magenta = '$C13' # '#e1acff'
-cyan    = '$C14' # '#a3f7ff'
+red     = '$C09'
+green   = '$C10'
+yellow  = '$C11'
+blue    = '$C12'
+magenta = '$C13'
+cyan    = '$C14'
 black   = '$C08'
 white   = '$C15'
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-$C00
-$C08
-
-$C07
-$C15
-
-# background = "#221133"
-# background = "#4400aa"
-
-# M.apply = function(cfg)
-#   cfg.color_scheme = "tokyonight_night"
-#   cfg.force_reverse_video_cursor = true
-#   cfg.colors = {
-#     foreground = "$XFG",
-#     background = "$XBG",
-#     ansi = {
-#       "$C00",
-#       "$C01",
-#       "$C02",
-#       "$C03",
-#       "$C04",
-#       "$C05",
-#       "$C06",
-#       "$C07",
-#     },
-#     brights = {
-#       "$C08",
-#       "$C09",
-#       "$C10",
-#       "$C11",
-#       "$C12",
-#       "$C13",
-#       "$C14",
-#       "$C15",
-#     },
-#   }
-# end
-#
-# return M
+# [colors.dim]
+# red     = '$C09'
+# green   = '$C10'
+# yellow  = '$C11'
+# blue    = '$C12'
+# magenta = '$C13'
+# cyan    = '$C14'
+# black   = '$C08'
+# white   = '$C15'
