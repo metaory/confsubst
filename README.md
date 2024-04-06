@@ -3,25 +3,45 @@ CONFSUBST
 
 ```ex
 NAME
-	confsubst - templating and variable interpolation CLI utility
+	confsubst - templating & variable interpolation CLI utility
 
 
 SYNOPSIS
 	confsubst [--elVvh] [-o DIR] [--] [-]|DIR|FILE...
 
+	with no DIR|FILE... or if FILE is [-], read STDIN
 
+.
 DESCRIPTION
-	with no DIR|FILE..., or when FILE is [-], read STDIN
+	confsubst is a simple cli tool for populating templates with user/system defined variables.
+
+	with "-e, --env <FILE>" it loads variables from a file or the system env if left empty.
+
+	it loads one or many template files.
+
+	if the specifed path is a directory it loads all files recursively in that path.
+
+	confsubst is "self-contained" & dont require any config file.
+
+	the template destination path & other config are defined in the same template file
+	it supports a vim modeline like syntax.
+	the modeline can be placed anywhere in the file as a comment.
+	eg:
+.
+		"-- mxc: path=$XDG_CONFIG_HOME/wezterm/color.lua label=wezterm"
+		"# mxc: path=$XDG_CONFIG_HOME/kitty/kittheme.conf"
+		"! mxc: path=$XDG_CONFIG_HOME/mxc/mxresources.xdefaults"
 
 
+.
 OPTIONS
-	e, --env <FILE>      environment overrides
-	l, --log <FILE>      verbose log file
-	o, --output <DIR>    output path
-	V, --verbose         be more verbose
-	q, --quiet, --silent inhibit the usual output
-	h, --help            display this help and exit
-	v, --version         display version and exit
+	-e, --env <FILE>      environment overrides
+	-l, --log <FILE>      verbose log file
+	-o, --output <DIR>    output path
+	-V, --verbose         be more verbose
+	-q, --quiet, --silent inhibit the usual output
+	-h, --help            display this help & exit
+	-v, --version         display version & exit
 
 
 EXAMPLES
@@ -37,10 +57,10 @@ EXAMPLES
 	# substitute all files under templates/ with increased verbosity
 	confsubst --verbose templates
 
-	# substitute all files resulted from command and override output path
+	# substitute all files resulted from command & override output path
 	confsubst -o myoutput - <(ls --zero | tr '\0' ' ')
 
-	# substitute all files received as stdin and override log path
+	# substitute all files received as stdin & override log path
 	find . -type f -print0 | confsubst -l /tmp/mylog
 
 
@@ -52,14 +72,14 @@ AUTHOR
 	metaory <metaory@gmail.com>, Jan 2024
 ```
 
-#### Templating and Variable Interpolation CLI Utility
+#### Templating & Variable Interpolation CLI Utility
 
 ##### Render `STDIN|DIR|FILE...` with `[-e <FILE>]|env`
 
 Substitute placeholders in file(s)
 
 ###### ● Substitutes Files Placeholders
-###### ● Self-contained Options with modeline like syntax
+###### ● Self-contained Options with vim modeline like syntax
 ###### ● ~~Pre/Post Hooks~~
 
 ## Features
@@ -108,7 +128,7 @@ confsubst -e ~/dummy/.env  mytemplate/
 
 ## Example Use Cases
 
-#### Generate Environment Variables at Runtime and Substitute config file placeholders with it
+#### Generate Environment Variables at Runtime & Substitute config file placeholders with it
 
 `Pre Hook` to **generate** some variables at runtime
 
@@ -208,16 +228,16 @@ A post hook to do clean up, reload apps config, or run any other post steps.
 ---
 
 ## Config (template) files
-- All provided files (or all files in provided directory) will parsed and populated
+- All provided files (or all files in provided directory) will parsed & populated
 
-- The file can be any ascii charset file with any name and extension
+- The file can be any ascii charset file with any name & extension
 
 - Optionally there can be a **modeline** comment somewhere in the file
 
 #### modeline syntax
 The **modeline** follows similar syntax to the first form of (n)Vim modeline [:h modeline](https://neovim.io/doc/user/options.html#modeline)
 
-The **modeline** and **all** its keys are **optional**
+The **modeline** & **all** its keys are **optional**
 
 ```cpp
 [text{white}]{mx:|mxc:}[white]{options}
@@ -359,9 +379,9 @@ All of Current requirements are part of the [base](https://archlinux.org/package
 
 [8.1 Environment Variable Definition](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap08.html)
 
->  These strings have the form name=value; names shall not contain the character '='. For values to be portable across systems conforming to POSIX.1-2017, the value shall be composed of characters from the portable character set (except NUL and as indicated below). There is no meaning associated with the order of strings in the environment. If more than one string in an environment of a process has the same name, the consequences are undefined.
+>  These strings have the form name=value; names shall not contain the character '='. For values to be portable across systems conforming to POSIX.1-2017, the value shall be composed of characters from the portable character set (except NUL & as indicated below). There is no meaning associated with the order of strings in the environment. If more than one string in an environment of a process has the same name, the consequences are undefined.
 
-> Environment variable names used by the utilities in the Shell and Utilities volume of POSIX.1-2017 consist solely of uppercase letters, digits, and the <underscore> ( '_' ) from the characters defined in Portable Character Set and do not begin with a digit. Other characters may be permitted by an implementation; applications shall tolerate the presence of such names. Uppercase and lowercase letters shall retain their unique identities and shall not be folded together. The name space of environment variable names containing lowercase letters is reserved for applications. Applications can define any environment variables with names from this name space without modifying the behavior of the standard utilities.
+> Environment variable names used by the utilities in the Shell & Utilities volume of POSIX.1-2017 consist solely of uppercase letters, digits, & the <underscore> ( '_' ) from the characters defined in Portable Character Set & do not begin with a digit. Other characters may be permitted by an implementation; applications shall tolerate the presence of such names. Uppercase & lowercase letters shall retain their unique identities & shall not be folded together. The name space of environment variable names containing lowercase letters is reserved for applications. Applications can define any environment variables with names from this name space without modifying the behavior of the standard utilities.
 
 ---
 
