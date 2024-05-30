@@ -1,4 +1,4 @@
-# mxc: path=$XDG_CONFIG_HOME/tmux/tmux.mx
+# mxc: path=$XDG_CONFIG_HOME/tmux/colors.tmux
 
 C00='${C00}'
 C01='${C01}'
