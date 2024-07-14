@@ -107,7 +107,7 @@ cd confsubst
 chmod +x confsubst
 
 # Link it somewhere in your PATH
-ln -sfv confsubst /usr/bin/confsubst
+ln -svf $PWD/confsubst /usr/bin/confsubst
 
 # Use it anywhere
 

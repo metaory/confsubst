@@ -30,6 +30,9 @@
 *.cursor_text_color:    $WFX
 *.cursor:               $WBX
 
+*.cww: #FFFFFF
+*.cbb: #000000
+
 *.c00: $C00
 *.c01: $C01
 *.c02: $C02
