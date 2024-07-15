@@ -166,11 +166,14 @@ function readarg {
 
 # shellcheck source=/dev/null
 function readenv {
-  [ -e "$ENVFILE" ] && source <(sed \
-    -e '/^\(\s*\)#.*/d' \
+  [ -e "$ENVFILE" ] && source <(sed -E \
+    -e '/^(\s*)#.*/d' \
     -e '/^$/d' \
-    -e 's/^\(\w.\+\)=/export \1=/' \
+    -e 's/^(\w+)=#([A-Fa-f0-9]{6})$/\0\nexport \1_=\2/' \
+    -e 's/^(\w+)=/export \1=/' \
     "$ENVFILE")
+
+  return 0
 }
 
 # #### ############### #####################################
