@@ -69,6 +69,7 @@
 *.cx4: $CX4
 *.cx5: $CX5
 *.cx6: $CX6
+*.cx7: $CX7
 
 *.sk0: $SK0
 *.sk1: $SK1

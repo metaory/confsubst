@@ -35,7 +35,6 @@ CY4='${CY4}'
 CY5='${CY5}'
 CY6='${CY6}'
 CY7='${CY7}'
-CY8='${CY8}'
 #━━━━━━━━━━━┛
 
 #▁▁▁X▁BURNT▁
@@ -48,7 +47,6 @@ CX4='${CX4}'
 CX5='${CX5}'
 CX6='${CX6}'
 CX7='${CX7}'
-CX8='${CX8}'
 #━━━━━━━━━━━┛
 
 #▁SEEDS▁SWE▁
@@ -61,8 +59,8 @@ EBG='${EBG}'
 EFG='${EFG}'
 XBG='${XBG}'
 XFG='${XFG}'
-OBG='${CX5}'
-OFG='#000000'
+OBG='${C08}'
+OFG='#FFFFFF'
 #━━━━━━━━━━━┛
 
 #▁▁▁SEED▁S▁▁

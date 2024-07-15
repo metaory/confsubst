@@ -31,7 +31,6 @@ export CY4='${CY4}'
 export CY5='${CY5}'
 export CY6='${CY6}'
 export CY7='${CY7}'
-export CY8='${CY8}'
 #━━━━━━━━━━━━━━━━━┛
 
 #▁▁▁X▁BURNT▁▁▁▁▁▁▁
@@ -44,7 +43,6 @@ export CX4='${CX4}'
 export CX5='${CX5}'
 export CX6='${CX6}'
 export CX7='${CX7}'
-export CX8='${CX8}'
 #━━━━━━━━━━━━━━━━━┛
 
 #▁▁▁SEEDS▁SWE▁▁▁▁▁
