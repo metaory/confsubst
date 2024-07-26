@@ -48,7 +48,7 @@ function log {
 }
 
 function log_expand {
-  ! (( VERBOSE )) || (( SILENCE )) && return
+  (( SILENCE )) && return
   while [ "$1" ]; do
     printf '%s%*s%s\n' "${_C6}" -8 "$1" "${_C3}${!1}${_CX}"
     shift
@@ -117,7 +117,7 @@ function set_mode_data {
   MOD_OPT=()
   while read -r L; do
     ! [[ $L =~ .*mx([c])?: ]] && continue
-    while [[ $L =~ ([a-z]+)=([a-zA-Z0-9_./$\-]+) ]]; do
+    while [[ $L =~ ([a-z]+)=([a-zA-Z0-9_+./$\-]+) ]]; do
       MOD_OPT["${BASH_REMATCH[1]}"]="$(envsubst <<< "${BASH_REMATCH[2]}")"
       L=${L/"${BASH_REMATCH[0]}"/}
     done
@@ -161,7 +161,7 @@ function readarg {
 
   ! (( "${#FILES[@]}" )) && bad_exit NO_FILE_MATCHED
 
-  log_expand ENVFILE LOGFILE OUTPUT VERBOSE SILENCE FILES
+  log_expand ENVFILE LOGFILE OUTPUT VERBOSE SILENCE
 }
 
 # shellcheck source=/dev/null
@@ -188,14 +188,10 @@ function process {
     local T="${OUTPUT}/${F#*/}"
     local O="${MOD_OPT[path]:-/dev/null}"
 
-    echo F "$F"
-    echo T "$T"
-    echo O "$O"
-    echo M "${MOD_OPT[*]}"
-
     envsubst < "${F}" | tee  "${T}" "${O}" &> /dev/null
 
-    ! (( SILENCE )) && printf '%s %s\n' "${_C3}[${C}/${#FILES[@]}]" "${_C4}${F}"
+    ! (( SILENCE )) && printf '%12s %s\n' "${_C3}[${C}/${#FILES[@]}]" "${_C4}${F/${HOME}/\~}"
+    ! (( SILENCE )) && printf '\t%12s \n' "${_C5} ${O/${HOME}/\~}"$'\n'
   done
 }
 
