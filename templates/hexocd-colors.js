@@ -1,0 +1,1 @@
+/home/meta/dev/meta/hexocd-colorscheme/templates/hexocd-colors.js

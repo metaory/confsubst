@@ -1,7 +1,7 @@
 CONFSUBST
 =========
 
-```ex
+```elixir
 NAME
 	confsubst - templating & variable interpolation CLI utility
 

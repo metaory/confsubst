@@ -1,5 +1,1 @@
-# mxc: path=$XDG_CONFIG_HOME/mxc/seed.mx
-
-export SBG='${SBG}'
-export WBG='${WBG}'
-export EBG='${EBG}'
+/home/meta/dev/meta/hexocd-colorscheme/templates/shell-seed.sh
