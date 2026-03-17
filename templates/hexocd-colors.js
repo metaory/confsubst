@@ -1,4 +1,8 @@
-// mxc: path=$HOME/dev/forks/+CLI.GEN.CV/jc4/src/styles/colors.js
+// mxc: path=$XDG_CONFIG_HOME/mxc/hexocd-colors.js
+
+//  ░░░░░▒▒▒▒▒▓▓▓▓█━╸made with╺━█▓▓▓▓▒▒▒▒▒░░░░░
+//  ░░ https://github.com/metaory/confsubst  ░░
+//  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
 export default {
   // ▁▁▁B/W▁▁▁
