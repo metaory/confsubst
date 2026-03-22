@@ -45,22 +45,22 @@ OPTIONS
 
 
 EXAMPLES
-	# substitute all files under templates/
+	# Whole templates directory
 	confsubst templates
 
-	# substitute two files
+	# Only two templates
 	confsubst templates/wezterm-color.lua templates/nvim-colors.lua
 
-	# substitute all files under templates/ override environment with .env file
+	# Set env file and templates directory
 	confsubst -e .env -- templates
 
-	# substitute all files under templates/ with increased verbosity
+	# Enable verbose logs and set templates directory
 	confsubst --verbose templates
 
-	# substitute all files resulted from command & override output path
-	confsubst -o myoutput - <(ls --zero | tr '\0' ' ')
+	# Specify the output directory and run all templates in current directory
+	confsubst -o myoutput - <(ls --zero | tr \0)
 
-	# substitute all files received as stdin & override log path
+	# Pipe in template files
 	find . -type f -print0 | confsubst -l /tmp/mylog
 
 
