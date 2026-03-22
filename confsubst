@@ -2,25 +2,25 @@
 
 # #### ############ ########################################
 # #### INFO: [VARS] ########################################
-# #### ############
+# ###################
 declare -a FILES
 SCRIPT="${0##*/}"
 ENVFILE='.env'
-VERSION="0.0.1"
+VERSION="0.2.0"
 VERBOSE=0
 SILENCE=0
 LOGFILE=/tmp/mxsh.log
 OUTPUT=/tmp/mxc
 
-# #### ################### #################################
+# ##########################################################
 # #### INFO: [CONFIG_MAPS] #################################
-# #### ###################
+# ###################
 declare -A COL_MAP=( [0]=6 [1]=2 [2]=4 [3]=3 [4]=1 )
 declare -A LBL_MAP=( [0]=TRACE [1]=OK [2]=INFO [3]=WARN [4]=ERROR )
 
-# #### ############## ######################################
+# ##########################################################
 # #### INFO: [PRINTS] ######################################
-# #### ##############
+# ###################
 declare -g "_CX"="$(tput sgr0)"
 declare -g "_CB"="$(tput bold)"
 for i in {1..10}; do declare -g "_C${i}"="$(tput setaf "${i}")"; done
@@ -97,48 +97,66 @@ $(_CC 3 OPTIONS)
 
 $(_CC 3 EXAMPLE)
 =======
-$(_CC 8 '$') $(_CC 4 'confsubst') $(_CC 3  'templates')
-$(_CC 8 '$') $(_CC 4 'confsubst') $(_CC 3  'templates/wezterm-color.lua templates/nvim-colors.lua')
-$(_CC 8 '$') $(_CC 4 'confsubst') $(_CC 2 '-e .env') -- $(_CC 3 'templates')
-$(_CC 8 '$') $(_CC 4 'confsubst') $(_CC 2 '--verbose') $(_CC 3 'templates')
-$(_CC 8 '$') $(_CC 4 'confsubst') $(_CC 2 '-o myoutput') - $(_CC 3 "<(ls --zero | tr '\0' ' ')")
-$(_CC 8 '$') $(_CC 3 'find . -type f -print0') $(_CC 1 '|') $(_CC 4 'confsubst') $(_CC 2 '-l /tmp/mylog')
+$(_CC 8 Whole templates directory)
+$(_CC 6 confsubst) $(_CC 3 templates)
+
+$(_CC 8 Only two templates)
+$(_CC 6 confsubst) $(_CC 3 templates/wezterm-color.lua templates/nvim-colors.lua)
+
+$(_CC 8 Set env file and templates directory)
+$(_CC 6 confsubst) $(_CC 2 -e .env) -- $(_CC 3 templates)
+
+$(_CC 8 Enable verbose logs and set templates directory)
+$(_CC 6 confsubst) $(_CC 2 --verbose) $(_CC 3 templates)
+
+$(_CC 8 Specify the output directory and run all templates in current directory)
+$(_CC 6 confsubst) $(_CC 2 -o myoutput) - $(_CC 3 '<(ls --zero | tr \0)')
+
+$(_CC 8 Pipe in template files)
+$(_CC 3 find . -type f -print0) $(_CC 1 '|') $(_CC 6 confsubst) $(_CC 2 -l /tmp/mylog)
 EOM
   # $(_CO -f --force)           replace existing destination files
   # $(_CO -I --ignore-modeline) ignore any modeline
 }
 
-# #### ############# #######################################
-# #### INFO: [PARSE] #######################################
-# #### #############
+# ##########################################################
+# #### INFO: [PROCESS] #####################################
+# ###################
 declare -A MOD_OPT
 
-function set_mode_data {
-  MOD_OPT=()
-  while read -r L; do
-    ! [[ $L =~ .*mx([c])?: ]] && continue
-    while [[ $L =~ ([a-z]+)=([a-zA-Z0-9_+./$\-]+) ]]; do
-      MOD_OPT["${BASH_REMATCH[1]}"]="$(envsubst <<< "${BASH_REMATCH[2]}")"
-      L=${L/"${BASH_REMATCH[0]}"/}
-    done
-  done <"$1"
-  log 0 "$(declare -p MOD_OPT)"
+function process {
+  local C=0
+  for F in "${FILES[@]}"; do
+    (( C++ ))
+    while read -r L; do
+      ! [[ $L =~ .*mx([c])?: ]] && continue
+      while [[ $L =~ ([a-z]+)=([a-zA-Z0-9_+./$\-]+) ]]; do
+        MOD_OPT["${BASH_REMATCH[1]}"]="$(envsubst <<< "${BASH_REMATCH[2]}")"
+        local T="${OUTPUT}/${F#*/}"
+        local O="${MOD_OPT[path]:-/dev/null}"
+        L=${L/"${BASH_REMATCH[0]}"/}
+        envsubst < "${F}" | tee  "${T}" "${O}" &> /dev/null
+        ! (( SILENCE )) && printf '%12s %s\n' "${_C3}[${C}/${#FILES[@]}]" "${_C4}${F/${HOME}/\~}"
+        ! (( SILENCE )) && printf '\t%12s \n' "${_C5} ${O/${HOME}/\~}"$'\n'
+      done
+    done <"$F"
+  done
 }
 
-# #### ########################## ##########################
+# ##########################################################
 # #### INFO: [REQUIREMENT CHECKS] ##########################
-# #### ##########################
+# ###################
 command -v envsubst &> /dev/null || log 11 'gnu envsubst command not found (provided by gnu gettext)'
 command -v printenv &> /dev/null || log 11 'gnu printenv command not found (provided by gnu coreutils)'
 
-# #### ################## ##################################
+# ##########################################################
 # #### INFO: [READ.STDIN] #######################################
-# #### ##################
+# ###################
 function readstdin { [ ! -t 0 ] && while read -r x ; do FILES+=( "$x" ) ; done; }
 
-# #### ################# ###################################
+# ##########################################################
 # #### INFO: [READ.ARGS] ########################################
-# #### #################
+# ###################
 function readarg {
   while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do case $1 in
     -e | --env) ENVFILE="$2"; shift ;;
@@ -176,30 +194,11 @@ function readenv {
   return 0
 }
 
-# #### ############### #####################################
-# #### INFO: [PROCESS] #####################################
-# #### ###############
-function process {
-  local C=0
-  for F in "${FILES[@]}"; do
-    (( C++ ))
-    set_mode_data "$F"
-
-    local T="${OUTPUT}/${F#*/}"
-    local O="${MOD_OPT[path]:-/dev/null}"
-
-    envsubst < "${F}" | tee  "${T}" "${O}" &> /dev/null
-
-    ! (( SILENCE )) && printf '%12s %s\n' "${_C3}[${C}/${#FILES[@]}]" "${_C4}${F/${HOME}/\~}"
-    ! (( SILENCE )) && printf '\t%12s \n' "${_C5} ${O/${HOME}/\~}"$'\n'
-  done
-}
-
 function maketmp { mkdir "$OUTPUT" &> /dev/null; }
 
-# #### ############ ########################################
+# ##########################################################
 # #### INFO: [MAIN] ########################################
-# #### ############
+# ###################
 function main {
   readarg "$@"
   readstdin
