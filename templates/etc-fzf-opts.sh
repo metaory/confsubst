@@ -2,7 +2,7 @@
 
 # mxc: path=$XDG_CONFIG_HOME/mxc/etc-fzf-opts.mx
 
-# original template ~/dev/meta/confsubst/templates/fzf-opts.sh
+# to be sourced in .zshrc
 
 export SKIM_DEFAULT_COMMAND="find . -type f || git ls-tree -r --name-only HEAD || rg --files || find ."
 

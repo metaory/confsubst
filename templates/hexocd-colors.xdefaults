@@ -1,6 +1,9 @@
 ! mxc: path=$XDG_CONFIG_HOME/mxc/hexocd-colors.xdefaults
 ! ######################################################
 
+! later include in ~/.Xresources
+! #include "/home/metaory/.config/mxc/hexocd-colors.xdefaults"
+
 !  ░░░░░▒▒▒▒▒▓▓▓▓█━╸made with╺━█▓▓▓▓▒▒▒▒▒░░░░░
 !  ░░ https://github.com/metaory/confsubst  ░░
 !  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░

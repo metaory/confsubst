@@ -79,7 +79,7 @@ function print_help {
 $(print_version)
 (C) 2024 Yan<metaory@gmail.com
 
-$(_CC 6 'confsubst') - $(_CC 4 'templating and variable interpolation CLI utility')
+$(_CC 6 confsubst) - $(_CC 4 templating and variable interpolation CLI utility)
 
 $(_CC 3 USAGE)
 =====
@@ -91,7 +91,7 @@ $(_CC 3 OPTIONS)
   $(_CO -o '--output <DIR>')    output path
   $(_CO -l '--log <FILE>')      verbose log file
   $(_CO -V '--verbose')         be more verbose
-  $(_CO -q '--quiet --silent') inhibit the usual output
+  $(_CO -q '--quiet --silent')  inhibit the usual output
   $(_CO -h '--help')            display this help and exit
   $(_CO -v '--version')         display version and exit
 
@@ -135,6 +135,7 @@ function process {
         local T="${OUTPUT}/${F#*/}"
         local O="${MOD_OPT[path]:-/dev/null}"
         L=${L/"${BASH_REMATCH[0]}"/}
+        mkdir "${O%/*}" &>/dev/null
         envsubst < "${F}" | tee  "${T}" "${O}" &> /dev/null
         ! (( SILENCE )) && printf '%12s %s\n' "${_C3}[${C}/${#FILES[@]}]" "${_C4}${F/${HOME}/\~}"
         ! (( SILENCE )) && printf '\t%12s \n' "${_C5} ${O/${HOME}/\~}"$'\n'
