@@ -90,10 +90,10 @@ $(_CC 3 OPTIONS)
   $(_CO -e '--env <FILE>')      environment overrides
   $(_CO -o '--output <DIR>')    output path
   $(_CO -l '--log <FILE>')      verbose log file
-  $(_CO -V --verbose)         be more verbose
-  $(_CO -q --quiet --silent) inhibit the usual output
-  $(_CO -h --help)            display this help and exit
-  $(_CO -v --version)         display version and exit
+  $(_CO -V '--verbose')         be more verbose
+  $(_CO -q '--quiet --silent') inhibit the usual output
+  $(_CO -h '--help')            display this help and exit
+  $(_CO -v '--version')         display version and exit
 
 $(_CC 3 EXAMPLE)
 =======
