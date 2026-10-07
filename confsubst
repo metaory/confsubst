@@ -188,8 +188,7 @@ function readenv {
   [ -e "$ENVFILE" ] && source <(sed -E \
     -e '/^(\s*)#.*/d' \
     -e '/^$/d' \
-    -e 's/^(\w+)=#([A-Fa-f0-9]{6})$/\0\nexport \1_=\2/' \
-    -e 's/^(\w+)=/export \1=/' \
+    -e 's/^(\w+)=(.*)$/export \1=\2\nexport \1_=${\1#\\#}/' \
     "$ENVFILE")
 
   return 0
