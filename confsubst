@@ -15,19 +15,25 @@ OUTPUT=/tmp/mxc
 # ##########################################################
 # #### INFO: [CONFIG_MAPS] #################################
 # ###################
-declare -A COL_MAP=( [0]=6 [1]=2 [2]=4 [3]=3 [4]=1 )
-declare -A LBL_MAP=( [0]=TRACE [1]=OK [2]=INFO [3]=WARN [4]=ERROR )
+declare -A COL_MAP=([0]=6 [1]=2 [2]=4 [3]=3 [4]=1)
+declare -A LBL_MAP=([0]=TRACE [1]=OK [2]=INFO [3]=WARN [4]=ERROR)
 
 # ##########################################################
 # #### INFO: [PRINTS] ######################################
 # ###################
 declare -g "_CX"="$(tput sgr0)"
 declare -g "_CB"="$(tput bold)"
-for i in {1..10}; do declare -g "_C${i}"="$(tput setaf "${i}")"; done
+for i in {0..10}; do declare -g "_C${i}"="$(tput setaf "${i}")"; done
 
-function _CC { tput setaf "${1}"; shift; printf '%s' "${*}"; tput sgr0; }
+function _CC {
+  tput setaf "${1}"
+  shift
+  printf '%s' "${*}"
+  tput sgr0
+}
 function _CO {
-  _CC 2 "$1"; shift
+  _CC 2 "$1"
+  shift
   while [ "$1" ]; do
     printf ', '
     _CC 2 "${1}"
@@ -39,16 +45,16 @@ function _CO {
 
 function log {
   local L="$1"
-  (( SILENCE )) && return
-  (( VERBOSE )) && printf -v VRB '[%s:%s:%03d]' "${FUNCNAME[1]}" "${SCRIPT}" "${BASH_LINENO[0]}"
+  ((SILENCE)) && return
+  ((VERBOSE)) && printf -v VRB '[%s:%s:%03d]' "${FUNCNAME[1]}" "${SCRIPT}" "${BASH_LINENO[0]}"
   printf -v MSG '%s%s %s' "$(_CC "${COL_MAP[${L}]}" "[${LBL_MAP[${L}]:-N}]")" "${VRB:-}" "${*:2}"
-  cat >> "$LOGFILE" <<< "$MSG"
-  (( L || VERBOSE)) && echo "$MSG"
-  (( L >= 4 )) && exit "$1"
+  cat >>"$LOGFILE" <<<"$MSG"
+  ((L || VERBOSE)) && echo "$MSG"
+  ((L >= 4)) && exit "$1"
 }
 
 function log_expand {
-  (( SILENCE )) && return
+  ((SILENCE)) && return
   while [ "$1" ]; do
     printf '%s%*s%s\n' "${_C6}" -8 "$1" "${_C3}${!1}${_CX}"
     shift
@@ -64,9 +70,9 @@ function print_version { _CC 2 "${SCRIPT}" "${VERSION}"; }
 
 function bad_exit {
   printf '%s' "${_C1}"
-  printf '%0.s=' $(seq 1 $(( ${#1} + 2 )))
+  printf '%0.s=' $(seq 1 $((${#1} + 2)))
   printf '\n %s\n' "${_C1}${1}"
-  printf '%0.s=' $(seq 1 $(( ${#1} + 2 )))
+  printf '%0.s=' $(seq 1 $((${#1} + 2)))
   printf '\n\n%s\n' "${_C4}$ confsubst --help"
   print_syntax
   exit 1
@@ -75,7 +81,7 @@ function bad_exit {
 # ----------------------------------------------------------
 
 function print_help {
-  cat << EOM
+  cat <<EOM
 $(print_version)
 (C) 2024 Yan<metaory@gmail.com
 
@@ -127,18 +133,18 @@ declare -A MOD_OPT
 function process {
   local C=0
   for F in "${FILES[@]}"; do
-    (( C++ ))
+    ((C++))
     while read -r L; do
       ! [[ $L =~ .*mx([c])?: ]] && continue
       while [[ $L =~ ([a-z]+)=([a-zA-Z0-9_+./$\-]+) ]]; do
-        MOD_OPT["${BASH_REMATCH[1]}"]="$(envsubst <<< "${BASH_REMATCH[2]}")"
+        MOD_OPT["${BASH_REMATCH[1]}"]="$(envsubst <<<"${BASH_REMATCH[2]}")"
         local T="${OUTPUT}/${F#*/}"
         local O="${MOD_OPT[path]:-/dev/null}"
         L=${L/"${BASH_REMATCH[0]}"/}
         mkdir "${O%/*}" &>/dev/null
-        envsubst < "${F}" | tee  "${T}" "${O}" &> /dev/null
-        ! (( SILENCE )) && printf '%12s %s\n' "${_C3}[${C}/${#FILES[@]}]" "${_C4}${F/${HOME}/\~}"
-        ! (( SILENCE )) && printf '\t%12s \n' "${_C5} ${O/${HOME}/\~}"$'\n'
+        envsubst <"${F}" | tee "${T}" "${O}" &>/dev/null
+        ! ((SILENCE)) && printf '%12s %s\n' "${_C3}[${C}/${#FILES[@]}]" "${_C4}${F/${HOME}/\~}"
+        ! ((SILENCE)) && printf '\t%12s \n' "${_C5} ${O/${HOME}/\~}"$'\n'
       done
     done <"$F"
   done
@@ -147,38 +153,56 @@ function process {
 # ##########################################################
 # #### INFO: [REQUIREMENT CHECKS] ##########################
 # ###################
-command -v envsubst &> /dev/null || log 11 'gnu envsubst command not found (provided by gnu gettext)'
-command -v printenv &> /dev/null || log 11 'gnu printenv command not found (provided by gnu coreutils)'
+command -v envsubst &>/dev/null || log 11 'gnu envsubst command not found (provided by gnu gettext)'
+command -v printenv &>/dev/null || log 11 'gnu printenv command not found (provided by gnu coreutils)'
 
 # ##########################################################
 # #### INFO: [READ.STDIN] #######################################
 # ###################
-function readstdin { [ ! -t 0 ] && while read -r x ; do FILES+=( "$x" ) ; done; }
+function readstdin { [ ! -t 0 ] && while read -r x; do FILES+=("$x"); done; }
 
 # ##########################################################
 # #### INFO: [READ.ARGS] ########################################
 # ###################
 function readarg {
-  while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do case $1 in
-    -e | --env) ENVFILE="$2"; shift ;;
-    -l | --log) LOGFILE="$2"; shift ;;
-    -o | --output) OUTPUT="$2";  shift ;;
+  while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do
+    case $1 in
+    -e | --env)
+      ENVFILE="$2"
+      shift
+      ;;
+    -l | --log)
+      LOGFILE="$2"
+      shift
+      ;;
+    -o | --output)
+      OUTPUT="$2"
+      shift
+      ;;
     -V | --verbose) VERBOSE=1 ;;
     -q | --quiet | --silent) SILENCE=1 ;;
-    -v | --version) print_version; exit ;;
-    -h | --help) print_help; exit ;;
+    -v | --version)
+      print_version
+      exit
+      ;;
+    -h | --help)
+      print_help
+      exit
+      ;;
     --) break ;;
     -) readstdin ;;
     *) bad_exit BAD_ARG ;;
-  esac; shift; done
+    esac
+    shift
+  done
 
   for input in "${@}"; do
-    [[ -f "$input" ]] && FILES+=( "$input" )
-    [[ -d "$input" ]] && mapfile -t tmp < <(find "$input" -type f) || tmp=( )
+    [[ -f "$input" ]] && FILES+=("$input")
+    [[ -d "$input" ]] && mapfile -t tmp < <(find "$input" -type f) || tmp=()
     FILES+=("${tmp[@]}")
   done
 
-  ! (( "${#FILES[@]}" )) && bad_exit NO_FILE_MATCHED
+  ! (("${#FILES[@]}")) && bad_exit NO_FILE_MATCHED
 
   log_expand ENVFILE LOGFILE OUTPUT VERBOSE SILENCE
 }
@@ -194,7 +218,7 @@ function readenv {
   return 0
 }
 
-function maketmp { mkdir "$OUTPUT" &> /dev/null; }
+function maketmp { mkdir "$OUTPUT" &>/dev/null; }
 
 # ##########################################################
 # #### INFO: [MAIN] ########################################
